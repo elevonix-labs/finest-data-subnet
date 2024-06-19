@@ -58,6 +58,7 @@ class Miner(BaseMinerNeuron):
         The 'forward' function is a placeholder and should be overridden with logic that is appropriate for
         the miner's intended operation. This method demonstrates a basic transformation of input data.
         """
+        print(f"-----------{synapse.dummy_input}")
         # TODO(developer): Replace with actual implementation logic.
         synapse.dummy_output = synapse.dummy_input * 2
         return synapse
@@ -166,4 +167,4 @@ if __name__ == "__main__":
     with Miner() as miner:
         while True:
             bt.logging.info(f"Miner running... {time.time()}")
-            time.sleep(5)
+            time.sleep(20)

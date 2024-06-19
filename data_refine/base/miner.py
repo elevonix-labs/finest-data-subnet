@@ -23,8 +23,8 @@ import traceback
 
 import bittensor as bt
 
-from template.base.neuron import BaseNeuron
-from template.utils.config import add_miner_args
+from data_refine.base.neuron import BaseNeuron
+from data_refine.utils.config import add_miner_args
 
 from typing import Union
 
@@ -125,6 +125,7 @@ class BaseMinerNeuron(BaseNeuron):
                 # Sync metagraph and potentially set weights.
                 self.sync()
                 self.step += 1
+                time.sleep(40)
 
         # If someone intentionally stops the miner, it'll safely terminate operations.
         except KeyboardInterrupt:
