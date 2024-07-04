@@ -26,26 +26,121 @@ aws_access_key_id = YOUR_ACCESS_KEY
 aws_secret_access_key = YOUR_SECRET_KEY
 ```
 
-### Install SLURM
+### Install SLURMDBD and configuration
 
-Install SLURM on your system to manage and execute the pipeline.
+- Install Required Dependencies
+```bash
+sudo apt update
+sudo apt upgrade -y
+sudo apt install build-essential mariadb-server mariadb-client libmariadb-dev-compat libmariadb-dev libssl-dev
+sudo apt install slurmdbd slurm-wlm
+```
+- Configure mariadb
+```bash
+sudo systemctl start mariadb
+sudo mysql_secure_installation
+```
+- Create SLURM database and User
+```bash
+sudo mysql -u root -p
+
+CREATE DATABASE slurm_acct_db;
+CREATE USER 'slurm'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON slurm_acct_db.* TO 'slurm'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+```
+```bash
+sudo nano /etc/slurm/slurmdbd.conf
+```
+
+```ini
+# slurmdbd.conf
+DbdHost=localhost
+DbdPort=6819
+SlurmUser=slurm
+StorageUser=slurm
+StoragePass=password
+StorageHost=localhost
+StoragePort=3306
+StorageLoc=slurm_acct_db
+```
+
+```bash
+sudo systemctl enable slurmdbd
+sudo systemctl start slurmdbd
+```
+- Verify the slurmdbd installation
+```bash
+sudo systemctl status slurmdbd
+```
+
+### Install SLURM and configuration
+
+- Install SLURM on your system to manage and execute the pipeline.
 
 ```bash
 apt update
+sudo apt install build-essential munge libmunge-dev libmunge2 libssl-dev
 apt install slurm-client
 apt install slurmctld
 apt install slurmd
 ```
-
-### SLURM Configuration
-
-Create and configure the SLURM configuration file `/etc/slurm/slurm.conf` with the following content:
-
+- Configure munge
+```bash
+sudo /usr/sbin/create-munge-key
+sudo systemctl enable munge
+sudo systemctl start munge
 ```
+
+- Set hostname
+```bash
+sudo hostnamectl set-hostname <head>
+```
+```bash
+sudo nano /etc/hosts
+```
+Add line for host `127.0.0.1 head`
+
+- Configure slurm
+
+```bash
+sudo nano /etc/slurm/slurm.conf
+```
+```ini
+# slurm.conf
 ClusterName=my_cluster
-ControlMachine=<ipaddress>.ptr
-PartitionName=hopper-cpu Nodes=<ipaddress> Default=YES MaxTime=1-00:00:00 State=UP
-NodeName=<ipaddress> CPUs=32 Sockets=1 CoresPerSocket=16 ThreadsPerCore=2 RealMemory=128000 State=UNKNOWN
+ControlMachine=head
+
+#ACCOUNTING
+JobAcctGatherType=jobacct_gather/linux
+AccountingStorageType=accounting_storage/slurmdbd
+AccountingStorageHost=127.0.0.1
+
+AuthType=auth/munge
+ProctrackType=proctrack/linuxproc
+
+# Nodes Configuration
+NodeName=head CPUs=32 Sockets=1 CoresPerSocket=16 ThreadsPerCore=2 RealMemory=10000 State=UNKNOWN
+
+# Partitions Configuration
+PartitionName=hopper Nodes=head Default=YES MaxTime=INFINITE State=UP OverSubscribe=Force
+```
+
+```bash
+sudo systemctl enable slurmd
+sudo systemctl start slurmd
+sudo systemctl enable slurmctld
+sudo systemctl start slurmctld
+```
+If you change slurm conf in the future, you should reconfigure and restart slurmd
+```bash
+slurmd reconfigure
+sudo systemctl restart slurmd
+sudo systemctl restart slurmctld
+```
+```bash
+scontrol update node=head state=RESUME
 ```
 
 **Note: You need to check your server specifications using the `lscpu` command.**
@@ -70,13 +165,9 @@ Create a virtual environment and install the required Python packages. It's reco
 ```bash
 python3.12 -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install 'datatrove[all]'@git+https://github.com/huggingface/datatrove
 ```
 
-Create a `requirements.txt` file with the necessary dependencies:
-
-```
-datatrove[all]
 ```
 
 ## Running the Script
