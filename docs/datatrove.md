@@ -32,12 +32,12 @@ aws_secret_access_key = YOUR_SECRET_KEY
 ```bash
 sudo apt update
 sudo apt upgrade -y
-sudo apt install build-essential mariadb-server mariadb-client libmariadb-dev-compat libmariadb-dev libssl-dev
-sudo apt install slurmdbd slurm-wlm
+sudo apt install mariadb-server
 ```
 - Configure mariadb
 ```bash
 sudo systemctl start mariadb
+sudo systemctl enable mariadb
 sudo mysql_secure_installation
 ```
 - Create SLURM database and User
@@ -51,6 +51,9 @@ FLUSH PRIVILEGES;
 EXIT;
 ```
 ```bash
+sudo apt install slurmdbd slurm-wlm
+```
+```bash
 sudo nano /etc/slurm/slurmdbd.conf
 ```
 
@@ -58,7 +61,8 @@ sudo nano /etc/slurm/slurmdbd.conf
 # slurmdbd.conf
 DbdHost=localhost
 DbdPort=6819
-SlurmUser=slurm
+SlurmUser=root
+StorageType=accounting_storage/mysql
 StorageUser=slurm
 StoragePass=password
 StorageHost=localhost
@@ -67,6 +71,7 @@ StorageLoc=slurm_acct_db
 ```
 
 ```bash
+sudo chmod 600 /etc/slurm/slurmdbd.conf
 sudo systemctl enable slurmdbd
 sudo systemctl start slurmdbd
 ```
@@ -80,15 +85,16 @@ sudo systemctl status slurmdbd
 - Install SLURM on your system to manage and execute the pipeline.
 
 ```bash
-apt update
-sudo apt install build-essential munge libmunge-dev libmunge2 libssl-dev
-apt install slurm-client
-apt install slurmctld
-apt install slurmd
+sudo apt update
+sudo apt install slurm slurmd slurmctld slurm-client
 ```
 - Configure munge
 ```bash
-sudo /usr/sbin/create-munge-key
+sudo apt install build-essential munge libmunge-dev libmunge2 libssl-dev
+
+sudo dd if=/dev/urandom bs=1 count=1024 of=/etc/munge/munge.key
+sudo chown munge:munge /etc/munge/munge.key
+sudo chmod 400 /etc/munge/munge.key
 sudo systemctl enable munge
 sudo systemctl start munge
 ```
@@ -124,7 +130,7 @@ ProctrackType=proctrack/linuxproc
 NodeName=head CPUs=32 Sockets=1 CoresPerSocket=16 ThreadsPerCore=2 RealMemory=10000 State=UNKNOWN
 
 # Partitions Configuration
-PartitionName=hopper Nodes=head Default=YES MaxTime=INFINITE State=UP OverSubscribe=Force
+PartitionName=hopper-cpu Nodes=head Default=YES MaxTime=INFINITE State=UP OverSubscribe=Force
 ```
 
 ```bash
@@ -156,8 +162,11 @@ python3 --version
 If necessary, install Python 3.12 or higher:
 
 ```bash
-apt update
-apt install python3.12 python3.12-venv python3.12-dev
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install -y cmake build-essential libboost-all-dev
+sudo apt install -y python3.12 python3.12-venv python3.12-dev
+
 ```
 
 Create a virtual environment and install the required Python packages. It's recommended to use a virtual environment.
@@ -167,8 +176,20 @@ python3.12 -m venv venv
 source venv/bin/activate
 pip install 'datatrove[all]'@git+https://github.com/huggingface/datatrove
 ```
-
+You should download the resource manually by running the following python script in your Python environment:
+```python
+# punkt_download.py
+import nltk
+nltk.download('punkt')
 ```
+```bash
+python punkt_download.py
+```
+
+## Updating script
+
+- Should remove `use_64bit_hashes` from MinhashConfig
+- Also should modify tasks in each stage
 
 ## Running the Script
 
@@ -177,6 +198,7 @@ After setting up the configurations and installing the required packages, you ca
 ```bash
 python fineweb.py
 ```
+**NOTE: You can monitoring status using command `squeue` and `sacct`**
 
 ## Pipeline Description
 
