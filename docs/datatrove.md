@@ -26,6 +26,11 @@ aws_access_key_id = YOUR_ACCESS_KEY
 aws_secret_access_key = YOUR_SECRET_KEY
 ```
 
+Check aws config using `aws s3 ls`
+For this, you should install `awscli` 
+Install it with `apt install awscli`
+
+
 ### Install SLURMDBD and configuration
 
 - Install Required Dependencies
@@ -113,6 +118,8 @@ Add line for host `127.0.0.1 head`
 ```bash
 sudo nano /etc/slurm/slurm.conf
 ```
+**Note: You need to check your server specifications using the `lscpu` and `free -m` command.**
+
 
 ```ini
 # slurm.conf
@@ -140,17 +147,17 @@ sudo systemctl start slurmd
 sudo systemctl enable slurmctld
 sudo systemctl start slurmctld
 ```
-If you change slurm conf in the future, you should reconfigure and restart slurmd
+
+Check slurm using `scontol show nodes`
+If state of node is drained or downed, run  `scontrol update node=head state=RESUME`
+
+Also if you change slurm conf in the future, you should reconfigure and restart slurmd
 ```bash
 slurmd reconfigure
 sudo systemctl restart slurmd
 sudo systemctl restart slurmctld
 ```
-```bash
-scontrol update node=head state=RESUME
-```
 
-**Note: You need to check your server specifications using the `lscpu` command.**
 
 ### Python Dependencies
 
@@ -161,7 +168,7 @@ python3 --version
 
 sudo apt update
 sudo apt install -y cmake build-essential libboost-all-dev
-sudo apt install python3
+sudo apt install python3 python3.10-venv
 ```
 
 Create a virtual environment and install the required Python packages. It's recommended to use a virtual environment.
@@ -174,11 +181,14 @@ pip install 'datatrove[all]'@git+https://github.com/huggingface/datatrove
 ```
 
 You should download the resource manually by running the following python script in your Python environment:
+Add file named `punkt_download.py`
+
 ```python
 # punkt_download.py
 import nltk
 nltk.download('punkt')
 ```
+Run script
 ```bash
 python punkt_download.py
 ```
@@ -186,7 +196,7 @@ python punkt_download.py
 ## Updating script
 
 - Should remove `use_64bit_hashes` from MinhashConfig
-- Also should modify tasks in each stage
+- Also should modify tasks in each executor
 
 ## Running the Script
 
