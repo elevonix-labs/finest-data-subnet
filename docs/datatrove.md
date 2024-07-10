@@ -101,7 +101,7 @@ sudo systemctl start munge
 
 - Set hostname
 ```bash
-sudo hostnamectl set-hostname <head>
+sudo hostnamectl set-hostname head
 ```
 ```bash
 sudo nano /etc/hosts
@@ -113,6 +113,7 @@ Add line for host `127.0.0.1 head`
 ```bash
 sudo nano /etc/slurm/slurm.conf
 ```
+
 ```ini
 # slurm.conf
 ClusterName=my_cluster
@@ -153,29 +154,25 @@ scontrol update node=head state=RESUME
 
 ### Python Dependencies
 
-Ensure you have Python 3.12 or higher installed. You can check your Python version with:
+Ensure you have Python 3.10. You can check your Python version with:
 
 ```bash
 python3 --version
-```
 
-If necessary, install Python 3.12 or higher:
-
-```bash
-sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt update
 sudo apt install -y cmake build-essential libboost-all-dev
-sudo apt install -y python3.12 python3.12-venv python3.12-dev
-
+sudo apt install python3
 ```
 
 Create a virtual environment and install the required Python packages. It's recommended to use a virtual environment.
 
 ```bash
-python3.12 -m venv venv
+python3 -m venv venv
 source venv/bin/activate
+pip install --upgrade pip
 pip install 'datatrove[all]'@git+https://github.com/huggingface/datatrove
 ```
+
 You should download the resource manually by running the following python script in your Python environment:
 ```python
 # punkt_download.py
