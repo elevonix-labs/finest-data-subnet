@@ -206,6 +206,9 @@ python punkt_download.py
 > | 64   , 128  | 2000        |
       ...
 - Configure bucket name for `s3://some_s3_bucket`
+- Also increase time for slurm ,   ` time="90:00:00",`
+- Also increate timeout to 1 in Trafilatura
+- And add cpus_per_task as same cpus with pc parameter in SlurmPipelineExecutor
 ## Running the Script
 
 After setting up the configurations and installing the required packages, you can run the script as follows:
