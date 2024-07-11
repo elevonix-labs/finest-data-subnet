@@ -26,6 +26,11 @@ aws_access_key_id = YOUR_ACCESS_KEY
 aws_secret_access_key = YOUR_SECRET_KEY
 ```
 
+Check aws config using `aws s3 ls`, after install `awscli`.
+Install it with `apt install awscli` 
+
+Also create s3 bucket for saving dataset, you can follow this [docs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html).
+
 ### Install SLURMDBD and configuration
 
 - Install Required Dependencies
@@ -113,6 +118,8 @@ Add line for host `127.0.0.1 head`
 ```bash
 sudo nano /etc/slurm/slurm.conf
 ```
+**Note: You need to check your server specifications using the `lscpu` and `free -m` command.**
+
 
 ```ini
 # slurm.conf
@@ -133,24 +140,25 @@ NodeName=head CPUs=32 Sockets=1 CoresPerSocket=16 ThreadsPerCore=2 RealMemory=10
 # Partitions Configuration
 PartitionName=hopper-cpu Nodes=head Default=YES MaxTime=INFINITE State=UP OverSubscribe=Force
 ```
-
+For `RealMemory` input the total value of `free -m` command.
+From `lscpu`, You can get the values `CPU(s):`, `Core(s) per socket:`, ` Thread(s) per core`, `Socket(s):`
 ```bash
 sudo systemctl enable slurmd
 sudo systemctl start slurmd
 sudo systemctl enable slurmctld
 sudo systemctl start slurmctld
 ```
-If you change slurm conf in the future, you should reconfigure and restart slurmd
+
+Check slurm using `scontol show nodes`
+If state of node is drained or downed, run  `scontrol update node=head state=RESUME`
+
+Also if you change slurm conf in the future, you should reconfigure and restart slurmd
 ```bash
 slurmd reconfigure
 sudo systemctl restart slurmd
 sudo systemctl restart slurmctld
 ```
-```bash
-scontrol update node=head state=RESUME
-```
 
-**Note: You need to check your server specifications using the `lscpu` command.**
 
 ### Python Dependencies
 
@@ -161,7 +169,7 @@ python3 --version
 
 sudo apt update
 sudo apt install -y cmake build-essential libboost-all-dev
-sudo apt install python3
+sudo apt install python3 python3.10-venv
 ```
 
 Create a virtual environment and install the required Python packages. It's recommended to use a virtual environment.
@@ -174,11 +182,14 @@ pip install 'datatrove[all]'@git+https://github.com/huggingface/datatrove
 ```
 
 You should download the resource manually by running the following python script in your Python environment:
+Add file named `punkt_download.py`
+
 ```python
 # punkt_download.py
 import nltk
 nltk.download('punkt')
 ```
+Run script
 ```bash
 python punkt_download.py
 ```
@@ -186,8 +197,18 @@ python punkt_download.py
 ## Updating script
 
 - Should remove `use_64bit_hashes` from MinhashConfig
-- Also should modify tasks in each stage
+- Also should modify tasks in main_executor into 2000 ~ 6000
 
+> | cpus , ram  | tasks       |
+> | ----------- | ----------- |
+> | 160  , 500  | 6000        |
+> | 128  , 250  | 4000        |
+> | 64   , 128  | 2000        |
+      ...
+- Configure bucket name for `s3://some_s3_bucket`
+- Also increase time for slurm ,   ` time="90:00:00",`
+- Also increate timeout to 1 in Trafilatura
+- And add cpus_per_task as same cpus with pc parameter in SlurmPipelineExecutor
 ## Running the Script
 
 After setting up the configurations and installing the required packages, you can run the script as follows:
