@@ -26,10 +26,10 @@ aws_access_key_id = YOUR_ACCESS_KEY
 aws_secret_access_key = YOUR_SECRET_KEY
 ```
 
-Check aws config using `aws s3 ls`
-For this, you should install `awscli` 
-Install it with `apt install awscli`
+Check aws config using `aws s3 ls`, after install `awscli`.
+Install it with `apt install awscli` 
 
+Also create s3 bucket for saving dataset, you can follow this [docs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html).
 
 ### Install SLURMDBD and configuration
 
@@ -197,7 +197,14 @@ python punkt_download.py
 ## Updating script
 
 - Should remove `use_64bit_hashes` from MinhashConfig
-- Also should modify tasks in main_executor into 5000 ~ 6000
+- Also should modify tasks in main_executor into 2000 ~ 6000
+
+> | cpus , ram  | tasks       |
+> | ----------- | ----------- |
+> | 160  , 500  | 6000        |
+> | 128  , 250  | 4000        |
+> | 64   , 128  | 2000        |
+      ...
 - Configure bucket name for `s3://some_s3_bucket`
 ## Running the Script
 
