@@ -140,7 +140,8 @@ NodeName=head CPUs=32 Sockets=1 CoresPerSocket=16 ThreadsPerCore=2 RealMemory=10
 # Partitions Configuration
 PartitionName=hopper-cpu Nodes=head Default=YES MaxTime=INFINITE State=UP OverSubscribe=Force
 ```
-
+For `RealMemory` input the total value of `free -m` command.
+From `lscpu`, You can get the values `CPU(s):`, `Core(s) per socket:`, ` Thread(s) per core`, `Socket(s):`
 ```bash
 sudo systemctl enable slurmd
 sudo systemctl start slurmd
@@ -196,8 +197,8 @@ python punkt_download.py
 ## Updating script
 
 - Should remove `use_64bit_hashes` from MinhashConfig
-- Also should modify tasks in each executor
-
+- Also should modify tasks in main_executor into 5000 ~ 6000
+- Configure bucket name for `s3://some_s3_bucket`
 ## Running the Script
 
 After setting up the configurations and installing the required packages, you can run the script as follows:
