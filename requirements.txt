@@ -1,1 +1,1 @@
-bittensor
+bittensor==6.9.3
