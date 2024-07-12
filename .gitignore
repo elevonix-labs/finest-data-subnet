@@ -16,6 +16,9 @@ eggs/
 .eggs/
 lib/
 lib64/
+venv/
+logs/
+slurm_logs/
 parts/
 sdist/
 var/
