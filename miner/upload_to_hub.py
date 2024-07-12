@@ -2,8 +2,8 @@ import dask.dataframe as dd
 from datasets import Dataset, DatasetDict
 import s3fs
 
-BUCKET_NAME = 'hf-datatrove'
-DUMP_TO_PROCESS = 'CC-MAIN-2024-10'
+BUCKET_NAME = 'datatrove-tmp'
+DUMP_TO_PROCESS = 'CC-MAIN-2023-50'
 
 # This is path for final result
 s3_path = f's3://{BUCKET_NAME}/minhash/{DUMP_TO_PROCESS}/deduped_output/**/*.jsonl.gz'
