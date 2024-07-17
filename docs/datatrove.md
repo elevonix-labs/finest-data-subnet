@@ -194,35 +194,33 @@ Run script
 python punkt_download.py
 ```
 
-## Updating script
-
-- Should remove `use_64bit_hashes` from MinhashConfig
-- Also should modify tasks in main_executor into 2000 ~ 6000
-
-> | cpus , ram  | tasks       |
-> | ----------- | ----------- |
-> | 160  , 500  | 6000        |
-> | 128  , 250  | 4000        |
-> | 64   , 128  | 2000        |
-      ...
-- Configure bucket name for `s3://some_s3_bucket`
-- Also increase time for slurm ,   ` time="90:00:00",`
-- Also increate timeout to 1 in Trafilatura
-- And add cpus_per_task as same cpus with pc parameter in SlurmPipelineExecutor
 ## Running the Script
 
-After setting up the configurations and installing the required packages, you can run the script as follows:
+After setting up the configurations and installing the required packages, you can run fineweb.py script in miner as follows:
+
+### Usage
+To run the script, use the following command:
 
 ```bash
-python fineweb.py
+python miner/fineweb.py --bucket_name BUCKET_NAME --data_url DATA_URL [--total_tasks TOTAL_TASKS] [--cpus_per_task CPUS_PER_TASK] [--limit LIMIT]
+
 ```
+### Arguments
+
+Arguments
+--bucket_name: Name of the S3 bucket where the data is stored and processed.
+--data_url: Destination prefix in the S3 bucket where the WARC files are located.
+--total_tasks (optional): Total number of tasks to run. Default is 4.
+--cpus_per_task (optional): Number of CPUs per task. Default is 32.
+--limit (optional): Number of limit in WarcReader. Default is None.
+
 **NOTE: You can monitoring status using command `squeue` and `sacct`**
 
 ## Pipeline Description
 
 The script processes data in multiple stages:
 
-1. **Reading WARC files**: Reads WARC files from Common Crawl using the specified dump.
+1. **Reading WARC files**: Reads WARC files from sub_data using the specified dump.
 2. **Filtering**: Applies multiple filters including URL filtering, language filtering, and quality filtering.
 3. **Deduplication**: Uses Minhash for deduplication in multiple stages:
    - Computing Minhash signatures
