@@ -202,7 +202,7 @@ After setting up the configurations and installing the required packages, you ca
 To run the script, use the following command:
 
 ```bash
-python miner/fineweb.py --bucket_name BUCKET_NAME --data_url DATA_URL [--total_tasks TOTAL_TASKS] [--cpus_per_task CPUS_PER_TASK]
+python miner/fineweb.py --bucket_name BUCKET_NAME --data_url DATA_URL [--total_tasks TOTAL_TASKS] [--cpus_per_task CPUS_PER_TASK] [--limit LIMIT]
 
 ```
 ### Arguments
@@ -212,6 +212,7 @@ Arguments
 --data_url: Destination prefix in the S3 bucket where the WARC files are located.
 --total_tasks (optional): Total number of tasks to run. Default is 4.
 --cpus_per_task (optional): Number of CPUs per task. Default is 32.
+--limit (optional): Number of limit in WarcReader. Default is None.
 
 **NOTE: You can monitoring status using command `squeue` and `sacct`**
 

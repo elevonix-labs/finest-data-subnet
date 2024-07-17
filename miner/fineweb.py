@@ -17,7 +17,7 @@ from datatrove.pipeline.readers import JsonlReader, WarcReader
 from datatrove.pipeline.tokens import TokensCounter
 from datatrove.pipeline.writers.jsonl import JsonlWriter
 
-def main(bucket_name, data_url, total_tasks=4, cpus_per_task=32):
+def main(bucket_name, data_url, total_tasks=4, cpus_per_task=32 , limit = None):
     MAIN_OUTPUT_PATH = f"s3://{bucket_name}"
     FILTERING_OUTPUT_PATH = f"{MAIN_OUTPUT_PATH}/base_processing"
 
@@ -27,6 +27,7 @@ def main(bucket_name, data_url, total_tasks=4, cpus_per_task=32):
             WarcReader(
                 f"s3://{bucket_name}/{data_url}",
                 glob_pattern="*.warc.gz",  # we want the warc files
+                limit=limit,
             ),
             URLFilter(exclusion_writer=JsonlWriter(f"{FILTERING_OUTPUT_PATH}/removed/1_url")),
             Trafilatura(favour_precision=True, timeout=1),
@@ -159,6 +160,7 @@ if __name__ == "__main__":
     parser.add_argument('--data_url', type=str, required=True, help='Destination prefix in the S3 bucket')
     parser.add_argument('--total_tasks', type=int, default=4, help='Total number of tasks')
     parser.add_argument('--cpus_per_task', type=int, default=32, help='Number of CPUs per task')
+    parser.add_argument('--limit', type=int, default=None, help='Number of limit in WarcReader')
 
     args = parser.parse_args()
 
@@ -167,4 +169,5 @@ if __name__ == "__main__":
         data_url=args.data_url,
         total_tasks=args.total_tasks,
         cpus_per_task=args.cpus_per_task,
+        limit=args.limit,
     )
