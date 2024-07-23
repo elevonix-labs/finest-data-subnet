@@ -13,7 +13,13 @@ pip install -r requirements.txt
 ### 2. Prepare the Environment
 Make sure you have access to an S3 bucket where the data is stored and where the outputs will be saved. Also, ensure you have a Slurm-based HPC system for running the pipeline.
 If you are not familiar with Slurm, please refer to [datatrove.md](datatrove.md).
-
+Also make sure you have a `.env` file in the same directory as your script with the following environment variables set:
+```ini
+AWS_ACCESS_KEY_ID=your_aws_access_key_id
+AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+AWS_DEFAULT_REGION=your_aws_region
+```
+You can refer to .env.sample
 ### 3. Prepare the Dataset
 The dataset should be stored in an S3 bucket. The data URL should point to the prefix where the WARC files are stored.
 You can manage your data efficiently on our site [data-manage.cerebromesh.io](https://data-manage.cerebromesh.io).
@@ -21,6 +27,31 @@ You can manage your data efficiently on our site [data-manage.cerebromesh.io](ht
 ### 4. Run the Pipeline
 You can run the pipeline using the provided script. Here's an example command to execute the script:
 ```bash
-python miner/pipeline_script.py --bucket_name your_bucket_name --data_url your_data_url [--total_tasks 4] [--cpus_per_task 32] [--limit 1000]
+python miner/main.py --bucket_name your_bucket_name --data_url your_data_url [--total_tasks total_task] [--cpus_per_task your_cpus_number] [--limit limit_per_task]
+```
+Example:
+```bash
+python miner/main.py --bucket_name data-refine --data_url split-data/1/warc --total_tasks 4 --cpus_per_task 32 --limit 100
 ```
 
+
+## Uploading Dataset to Hugging Face
+We have a script that uploads datasets from an S3 bucket to Hugging Face.
+
+### Prepare the Environment
+Make sure you have a `.env` file in the same directory as your script with the following environment variables set:
+```ini
+HF_TOKEN=your_huggingface_token
+AWS_ACCESS_KEY_ID=your_aws_access_key_id
+AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+```
+### Run the Script
+You can run the script using the following command:
+
+```bash
+python miner/upload_to_hf.py --bucket_name your_bucket_name --data_url your_data_url --hf_repo your_hf_repo
+```
+Example:
+```bash
+python miner/upload_to_hf.py --bucket_name data-refine --data_url minhash/deduped_output --hf_repo cerebromesh/data-refine
+```

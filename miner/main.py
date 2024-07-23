@@ -11,6 +11,8 @@ Example:
 """
 
 import argparse
+from dotenv import load_dotenv
+import os
 from datatrove.executor.slurm import SlurmPipelineExecutor
 from datatrove.pipeline.dedup import MinhashDedupCluster, MinhashDedupFilter, MinhashDedupSignature
 from datatrove.pipeline.dedup.minhash import MinhashConfig, MinhashDedupBuckets
@@ -166,6 +168,9 @@ def main(bucket_name, data_url, total_tasks=4, cpus_per_task=32, limit=None):
     stage4.run()
 
 if __name__ == "__main__":
+
+    load_dotenv()
+
     parser = argparse.ArgumentParser(description="Run data processing and deduplication pipeline")
     parser.add_argument('--bucket_name', type=str, required=True, help='Name of the S3 bucket')
     parser.add_argument('--data_url', type=str, required=True, help='Destination prefix in the S3 bucket')
