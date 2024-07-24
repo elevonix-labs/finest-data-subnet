@@ -55,3 +55,20 @@ Example:
 ```bash
 python miner/upload_to_hf.py --bucket_name data-refine --data_url minhash/deduped_output --hf_repo cerebromesh/data-refine
 ```
+
+## Committing Dataset to Bittensor Subtensor Chain
+We have a script that commits datasets to the Bittensor subtensor chain.
+
+### Prepare the Environment
+Make sure you have the required Bittensor dependencies installed and properly configured.
+
+### Run the Script
+You can run the script using the following command:
+
+```bash
+python commit_dataset.py --netuid your_netuid --hf_url your_hf_url --wallet.name your_wallet_name --wallet.hotkey wallet_hotkey_name
+```
+Example:
+```bash
+python commit_dataset.py --netuid 1 --hf_url https://huggingface.co/gpt2 --wallet.name miner --wallet.hotkey default
+```
