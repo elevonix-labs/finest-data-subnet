@@ -26,3 +26,11 @@ def get_hash_of_two_strings(string1: str, string2: str) -> str:
     string_hash = hashlib.sha256((string1 + string2).encode())
 
     return base64.b64encode(string_hash.digest()).decode("utf-8")
+
+
+def extract_commit(input:str)-> str:
+    # Split the string only at the first occurrence of ':'
+
+    url = input.split(':')[-1]
+
+    return url

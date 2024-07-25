@@ -70,5 +70,5 @@ python commit_dataset.py --netuid your_netuid --hf_url your_hf_url --wallet.name
 ```
 Example:
 ```bash
-python commit_dataset.py --netuid 1 --hf_url https://huggingface.co/gpt2 --wallet.name miner --wallet.hotkey default
+python commit_dataset.py --netuid 1 --hf_url cerebromesh/data-refine --wallet.name miner --wallet.hotkey default
 ```

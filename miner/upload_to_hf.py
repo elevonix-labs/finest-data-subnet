@@ -79,7 +79,7 @@ def upload_to_hf(hf_repo: str, bucket_name: str, data_url: str) -> None:
         )
 
         # S3 path to the dataset
-        s3_path = f's3://{bucket_name}/{data_url}'
+        s3_path = f's3://{bucket_name}/{data_url}/**/*.jsonl.gz'
 
         logging.info(f"Reading data from S3 path: {s3_path}")
 
@@ -87,6 +87,7 @@ def upload_to_hf(hf_repo: str, bucket_name: str, data_url: str) -> None:
             # Read JSON files from S3 bucket
             with ProgressBar():
                 df = dd.read_json(s3_path, blocksize=None, compression='gzip')
+                print(df)
             if df is None:
                 raise S3ReadError("Error occurred while getting data from S3.")
             logging.info("Data read successfully from S3.")
@@ -156,5 +157,4 @@ if __name__ == "__main__":
     parser.add_argument('--hf_repo', type=str, required=True, help='Hugging Face repository to upload the dataset')
 
     args = parser.parse_args()
-
     main(bucket_name=args.bucket_name, data_url=args.data_url, hf_repo=args.hf_repo)
