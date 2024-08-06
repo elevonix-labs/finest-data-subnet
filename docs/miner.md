@@ -35,40 +35,30 @@ python miner/main.py --bucket_name data-refine --data_url split-data/1/warc --to
 ```
 
 
-## Uploading Dataset to Hugging Face
-We have a script that uploads datasets from an S3 bucket to Hugging Face.
+## Upload to Hugging Face and Commit to Bittensor
+This script uploads a dataset from an S3 bucket to Hugging Face and commits the dataset URL to the Bittensor subtensor chain. It handles environment variables, S3 operations, dataset transformations, and Bittensor chain interactions.
+
+### 1. Install Dependencies
+Ensure you have the required dependencies installed. You can use the following command to install them:
+```bash
+pip install -r requirements.txt
+```
 
 ### Prepare the Environment
-Make sure you have a `.env` file in the same directory as your script with the following environment variables set:
+Make sure you have access to an S3 bucket where the data is stored and where the outputs will be saved. Also, ensure you have the required environment variables set. Create a .env file in the same directory as your script with the following environment variables set:
 ```ini
-HF_TOKEN=your_huggingface_token
+HF_TOKEN=your_hugging_face_token
 AWS_ACCESS_KEY_ID=your_aws_access_key_id
 AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+AWS_DEFAULT_REGION=your_aws_region
 ```
 ### Run the Script
 You can run the script using the following command:
 
 ```bash
-python miner/upload_to_hf.py --bucket_name your_bucket_name --data_url your_data_url --hf_repo your_hf_repo
+python miner/commit_to_chain.py --hf_repo your_hf_repo --bucket_name your_bucket_name --data_url your_data_url --wallet.name wallet_name --wallet.hotkey wallet_hotkey
 ```
 Example:
 ```bash
-python miner/upload_to_hf.py --bucket_name data-refine --data_url minhash/deduped_output --hf_repo cerebromesh/data-refine
-```
-
-## Committing Dataset to Bittensor Subtensor Chain
-We have a script that commits datasets to the Bittensor subtensor chain.
-
-### Prepare the Environment
-Make sure you have the required Bittensor dependencies installed and properly configured.
-
-### Run the Script
-You can run the script using the following command:
-
-```bash
-python commit_dataset.py --netuid your_netuid --hf_url your_hf_url --wallet.name your_wallet_name --wallet.hotkey wallet_hotkey_name
-```
-Example:
-```bash
-python commit_dataset.py --netuid 1 --hf_url cerebromesh/data-refine --wallet.name miner --wallet.hotkey default
+python miner/commit_to_chain.py --bucket_name data-refine --data_url minhash/deduped_output --hf_repo cerebromesh/data-refine --wallet.name miner --wallet.hotky default
 ```
