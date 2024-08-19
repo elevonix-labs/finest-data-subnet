@@ -54,9 +54,8 @@ async def main(config: bt.config):
             commit = subtensor.get_commitment(netuid=1, uid = uid)
             if commit is not None:
                 hf_url =utils.extract_commit(commit)
-                dataset = load_dataset(hf_url)
 
-                print(dataset)
+                print(hf_url)
     except Exception as e:
         print(e)
 
