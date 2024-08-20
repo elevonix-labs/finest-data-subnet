@@ -2,70 +2,93 @@
 
 This script is designed to commit datasets to the Bittensor subtensor chain. It initializes and parses command-line arguments, sets up the wallet and subtensor, and retrieves and processes datasets from the Bittensor metagraph.
 
-## Getting Commit
+## Install Dependencies
 
-### 1. Install Dependencies
+### Installing Poetry
+#### First, make sure you have Poetry installed. If not, install it using:
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+This installation script should automatically add Poetry to your PATH. If the installation was successful, try running:
+```bash
+poetry --version
+```
+#### Add Poetry to Your PATH Manually
+- First, locate the Poetry binary:
+```bash
+echo "$HOME/.local/bin/poetry"
+```
+- Add the Poetry binary directory to your PATH by editing your shell configuration file `nano ~/.bashrc`, `~/.zshrc`, or `~/.profile`
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+- After adding it to your PATH, apply the changes:
+```bash
+source ~/.bashrc
+```
+Now, you should be able to run:
+```bash
+poetry --version
+```
+### Installing Dependencies
 
 Ensure you have the required dependencies installed. You can use the following command to install them:
-
 ```bash
-pip install -r requirements.txt
+cd validator
+poetry install
+poetry run pip install flash-attn
 ```
+You need to install specific packages, such as `flash-attn` using the following command:
+```bash
+poetry run pip install flash-attn
+```
+## Getting Commit
 
-### 2. Prepare the Environment
+### 1. Prepare the Environment
 
 Make sure you have the necessary environment setup. You should have a Bittensor wallet and access to the Bittensor subtensor chain.
 
-### 3. Configuration
+### 2. Configuration
 
 The script uses command-line arguments for configuration. The main arguments include:
 ```ini
 HF_TOKEN=
 ```
-### 4. Running the Script
+### 3. Running the Script
 
 You can run the script using the following command:
 
 ```bash
-python validator/main.py --netuid your_netuid --wallet.name your_wallet --wallet.hotkey your_wallet_hotkey
+poetry run python validator/main.py --netuid your_netuid --wallet.name your_wallet --wallet.hotkey your_wallet_hotkey
 ```
 Example
 ```bash
-python validator/main.py --netuid 1 --wallet.name validator --wallet.hotkey default
+poetry run python validator/main.py --netuid 1 --wallet.name validator --wallet.hotkey default
 ```
 
 ## Traning and Evaluating
 
-### 1. Install Dependencies
-
-Ensure you have the required dependencies installed. You can use the following command to install them:
+### 1. Getting model config
 
 ```bash
-pip install -r validator/requirements.txt
-pip install --upgrade pip
-```
-
-### 2. Getting model config
-
-```bash
-python validator/config.py --hf-url your_hf_url
+poetry run python validator/config.py --hf-url your_hf_url
 ```
 Example
 ```bash
-python validator/config.py --hf-url barney49/data-refine
+poetry run python validator/config.py --hf-url barney49/data-refine
 ```
 
-### 3. Training model
+### 2. Training model
 
 ```bash
-CUDA_DEVICE_MAX_CONNECTIONS=1 torchrun --nproc_per_node=1 validator/train.py --config-file your_config_file
+CUDA_DEVICE_MAX_CONNECTIONS=1 poetry run torchrun --nproc_per_node=1 validator/train.py --config-file your_config_file
 ```
 Example
 ```bash
-CUDA_DEVICE_MAX_CONNECTIONS=1 torchrun --nproc_per_node=1 validator/train.py --config-file validator/config.yaml
+CUDA_DEVICE_MAX_CONNECTIONS=1 poetry run torchrun --nproc_per_node=1 validator/train.py --config-file validator/config.yaml
 ```
 
-### 4. Evaluating model
+### 3. Evaluating model
 
 ```bash
 export MASTER_ADDR=localhost
@@ -75,5 +98,5 @@ export RANK=0
 ```
 
 ```bash
-lighteval nanotron --checkpoint-config-path validator/checkpoints/10/config.yaml --lighteval-override validator/template.yaml
+CUDA_DEVICE_MAX_CONNECTIONS=1 poetry run lighteval nanotron --checkpoint-config-path validator/checkpoints/10/config.yaml --lighteval-override validator/template.yaml
 ```

@@ -12,9 +12,9 @@ from datasets import Dataset, DatasetDict
 import logging
 import boto3
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
-from utilities import utils
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from utilities import utils
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

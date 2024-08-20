@@ -9,7 +9,7 @@ import time
 from datasets import load_dataset
 
 # Add the directory containing 'utilities' to the system path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
 from utilities import utils
 
