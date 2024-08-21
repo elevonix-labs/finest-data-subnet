@@ -26,14 +26,15 @@ from datatrove.pipeline.writers.jsonl import JsonlWriter
 """
 DUMP_TO_PROCESS = "CC-MAIN-2023-50"  # example
 
-MAIN_OUTPUT_PATH = "s3://datatrove-tmp"  # You should create s3 bucket with your aws account before running script
+MAIN_OUTPUT_PATH = "s3://sub-datatrove"  # You should create s3 bucket with your aws account before running script
 FILTERING_OUTPUT_PATH = f"{MAIN_OUTPUT_PATH}/base_processing"   # We will store the output here
 
 main_processing_executor = SlurmPipelineExecutor(
     job_name=f"cc_{DUMP_TO_PROCESS}",
     pipeline=[
         WarcReader(
-            f"s3://commoncrawl/crawl-data/{DUMP_TO_PROCESS}/segments/",
+            # f"s3://commoncrawl/crawl-data/{DUMP_TO_PROCESS}/segments/",
+            f"s3://data-refine/split-data/",
             glob_pattern="*/warc/*",  # we want the warc files
             default_metadata={"dump": DUMP_TO_PROCESS},
         ),
@@ -62,7 +63,8 @@ main_processing_executor = SlurmPipelineExecutor(
         ),
         JsonlWriter(f"{FILTERING_OUTPUT_PATH}/output/{DUMP_TO_PROCESS}"),
     ],
-    tasks=4000,
+    # tasks=4000,
+    tasks = 4,
     time="90:00:00",
     logging_dir=f"{MAIN_OUTPUT_PATH}/logs/base_processing/{DUMP_TO_PROCESS}",
     slurm_logs_folder=f"logs/base_processing/{DUMP_TO_PROCESS}/slurm_logs",  # must be local
@@ -80,7 +82,7 @@ main_processing_executor.run()
 # you can also change ngrams or the number of buckets and their size here
 minhash_config = MinhashConfig(
     # use_64bit_hashes=True,  # better precision -> fewer false positives (collisions)
-    num_buckets=14,
+    num_buckets=4,
     hashes_per_bucket=8,
     n_grams=5,
 )
@@ -90,7 +92,7 @@ S3_MINHASH_BASE_PATH = f"{MAIN_OUTPUT_PATH}/minhash"
 S3_LOGS_FOLDER = f"{MAIN_OUTPUT_PATH}/logs/minhash"
 LOCAL_LOGS_FOLDER = "logs/minhash"
 
-TOTAL_TASKS = 1000
+TOTAL_TASKS = 4
 
 # this is the original data that we want to deduplicate
 INPUT_READER = JsonlReader(
