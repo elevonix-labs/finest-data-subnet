@@ -172,15 +172,6 @@ sudo apt install -y cmake build-essential libboost-all-dev
 sudo apt install python3 python3.10-venv
 ```
 
-Create a virtual environment and install the required Python packages. It's recommended to use a virtual environment.
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install --upgrade pip
-pip install 'datatrove[all]'@git+https://github.com/huggingface/datatrove
-```
-
 You should download the resource manually by running the following python script in your Python environment:
 Add file named `punkt_download.py`
 
@@ -191,7 +182,7 @@ nltk.download('punkt')
 ```
 Run script
 ```bash
-python punkt_download.py
+poetry run python miner/punkt_download.py
 ```
 
 ## Running the Script
@@ -202,7 +193,7 @@ After setting up the configurations and installing the required packages, you ca
 To run the script, use the following command:
 
 ```bash
-python miner/fineweb.py --bucket_name BUCKET_NAME --data_url DATA_URL [--total_tasks TOTAL_TASKS] [--cpus_per_task CPUS_PER_TASK] [--limit LIMIT]
+poetry run python miner/fineweb.py --bucket_name BUCKET_NAME --data_url DATA_URL [--total_tasks TOTAL_TASKS] [--cpus_per_task CPUS_PER_TASK] [--limit LIMIT]
 
 ```
 ### Arguments
