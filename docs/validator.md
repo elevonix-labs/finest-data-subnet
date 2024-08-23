@@ -36,7 +36,6 @@ Ensure you have the required dependencies installed. You can use the following c
 ```bash
 cd validator
 poetry install
-poetry run pip install flash-attn
 ```
 You need to install specific packages, such as `flash-attn` using the following command:
 ```bash

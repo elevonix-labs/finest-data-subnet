@@ -9,7 +9,7 @@ torchrun --nproc_per_node=8 run_train.py --config-file examples/config_tiny_llam
 """
 import argparse
 from typing import Dict, cast
-
+import os
 import numpy as np
 from nanotron import logging
 from nanotron.config import DataArgs, DatasetStageArgs, NanosetDatasetsArgs, PretrainDatasetsArgs
@@ -218,6 +218,24 @@ def get_dataloader(trainer: DistributedTrainer) -> Dict[str, DataLoader]:
         dataloaders[stage.name] = dataloader
     return dataloaders
 
+def train_model(config_file: str, world_size : int):
+    """
+    Function to load the trainer, get the dataloader, and start training.
+
+    :param config_file: Path to the YAML or Python config file.
+    """
+    os.environ["CUDA_DEVICE_MAX_CONNECTIONS"] = "1"
+    os.environ['MASTER_ADDR'] = os.environ.get('MASTER_ADDR', 'localhost')
+    os.environ['MASTER_PORT'] = os.environ.get('MASTER_PORT', '29500')
+    os.environ['WORLD_SIZE'] = str(os.environ.get('WORLD_SIZE', world_size))
+    os.environ['RANK'] = str(os.environ.get('RANK', 0))
+    os.environ['LOCAL_RANK'] = str(os.environ.get('LOCAL_RANK', os.environ['RANK']))
+    # Load trainer and data
+    trainer = DistributedTrainer(config_file)
+    dataloader = get_dataloader(trainer)
+
+    # Train
+    trainer.train(dataloader)
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -227,11 +245,5 @@ def get_args():
 
 if __name__ == "__main__":
     args = get_args()
-    config_file = args.config_file
-
-    # Load trainer and data
-    trainer = DistributedTrainer(config_file)
-    dataloader = get_dataloader(trainer)
-
-    # Train
-    trainer.train(dataloader)
+    args.world_size
+    train_model(args.config_file, world_size= args.world_size | 1)
