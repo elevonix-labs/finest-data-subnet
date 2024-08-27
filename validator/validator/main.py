@@ -9,7 +9,8 @@ import time
 from datasets import load_dataset
 from collections import defaultdict
 from config import generate_training_config
-from train import train_model
+from train import start_training_and_kill
+from evaluate import run_lighteval
 # Add the directory containing 'utilities' to the system path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
@@ -71,7 +72,8 @@ async def check_commits(config: bt.config):
                 if not previous_commit and previous_commit != current_commit:
                     hf_url = utils.extract_commit(current_commit)
                     if generate_training_config(hf_url):
-                        train_model('validator/config.yaml',config.world_size)
+                        if start_training_and_kill('validator/config.yaml',config.world_size):
+                            run_lighteval(config.world_size)
                     # print(f"Commit changed for uid {uid} from {previous_commit} to {current_commit}")
                     
                 # Update the stored commit

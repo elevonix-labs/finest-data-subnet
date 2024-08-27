@@ -29,6 +29,7 @@ from nanotron.parallel.pipeline_parallel.utils import get_input_output_pp_ranks
 from nanotron.trainer import DistributedTrainer
 from nanotron.utils import main_rank_first
 from torch.utils.data import DataLoader
+import multiprocessing
 
 try:
     from huggingface_hub import __version__ as hf_hub_version
@@ -218,7 +219,7 @@ def get_dataloader(trainer: DistributedTrainer) -> Dict[str, DataLoader]:
         dataloaders[stage.name] = dataloader
     return dataloaders
 
-def train_model(config_file: str, world_size : int):
+def train_process(config_file: str, world_size : int):
     """
     Function to load the trainer, get the dataloader, and start training.
 
@@ -226,7 +227,7 @@ def train_model(config_file: str, world_size : int):
     """
     os.environ["CUDA_DEVICE_MAX_CONNECTIONS"] = "1"
     os.environ['MASTER_ADDR'] = os.environ.get('MASTER_ADDR', 'localhost')
-    os.environ['MASTER_PORT'] = os.environ.get('MASTER_PORT', '29500')
+    os.environ['MASTER_PORT'] = '29500'
     os.environ['WORLD_SIZE'] = str(os.environ.get('WORLD_SIZE', world_size))
     os.environ['RANK'] = str(os.environ.get('RANK', 0))
     os.environ['LOCAL_RANK'] = str(os.environ.get('LOCAL_RANK', os.environ['RANK']))
@@ -237,6 +238,31 @@ def train_model(config_file: str, world_size : int):
     # Train
     trainer.train(dataloader)
 
+
+def start_training_and_kill(config_file: str, world_size: int):
+    """
+    Function to start the training process and terminate it after completion.
+    """
+    # Start the training in a separate process
+    process = multiprocessing.Process(target=train_process, args=(config_file, world_size))
+    process.start()
+
+    # Wait for the training to complete
+    process.join()
+
+    # Check if the process completed successfully
+    if process.exitcode == 0:
+        print(f"Training process {process.pid} completed successfully.")
+        return True
+    else:
+        # Optionally, terminate the process if it is still running
+        if process.is_alive():
+            print(f"Terminating training process {process.pid}")
+            process.terminate()
+            process.join()  # Ensure the process is cleaned up
+        print(f"Training process {process.pid} failed or was terminated.")
+        return False
+
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config-file", type=str, required=True, help="Path to the YAML or python config file")
@@ -246,4 +272,4 @@ def get_args():
 if __name__ == "__main__":
     args = get_args()
     args.world_size
-    train_model(args.config_file, world_size= args.world_size | 1)
+    start_training_and_kill(args.config_file, world_size= args.world_size | 1)
