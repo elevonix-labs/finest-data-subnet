@@ -58,44 +58,9 @@ HF_TOKEN=
 You can run the script using the following command:
 
 ```bash
-poetry run python validator/main.py --netuid your_netuid --wallet.name your_wallet --wallet.hotkey your_wallet_hotkey
+poetry run python validator/main.py --netuid netuid --wallet.name your_wallet_name --wallet.hotkey wallet_hotkey --subtensor.network test [--world_size gpu_count]
 ```
 Example
 ```bash
-poetry run python validator/main.py --netuid 1 --wallet.name validator --wallet.hotkey default
-```
-
-## Traning and Evaluating
-
-### 1. Getting model config
-
-```bash
-poetry run python validator/config.py --hf-url your_hf_url
-```
-Example
-```bash
-poetry run python validator/config.py --hf-url barney49/data-refine
-```
-
-### 2. Training model
-
-```bash
-CUDA_DEVICE_MAX_CONNECTIONS=1 poetry run torchrun --nproc_per_node=1 validator/train.py --config-file your_config_file
-```
-Example
-```bash
-CUDA_DEVICE_MAX_CONNECTIONS=1 poetry run torchrun --nproc_per_node=1 validator/train.py --config-file validator/config.yaml
-```
-
-### 3. Evaluating model
-
-```bash
-export MASTER_ADDR=localhost
-export MASTER_PORT=29500
-export WORLD_SIZE=1
-export RANK=0
-```
-
-```bash
-CUDA_DEVICE_MAX_CONNECTIONS=1 poetry run lighteval nanotron --checkpoint-config-path validator/checkpoints/10/config.yaml --lighteval-override validator/template.yaml
+poetry run python validator/main.py --netuid 204 --wallet.name validator1 --wallet.hotkey validator1 --subtensor.network test
 ```
