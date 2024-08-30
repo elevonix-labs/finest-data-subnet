@@ -1,19 +1,20 @@
 import sys
 import os
-import bittensor as bt
-import torch
-import argparse
 import asyncio
 import csv
 import time
-from datasets import load_dataset
+import argparse
 from collections import defaultdict
+
+import bittensor as bt
+from datasets import load_dataset
+
 from config import generate_training_config
 from train import start_training_and_kill
 from evaluate import run_lighteval
+
 # Add the directory containing 'utilities' to the system path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-
 from utilities import utils
 
 # Dictionary to store previous commits for comparison
@@ -48,17 +49,14 @@ async def check_commits(config: bt.config):
         config (bt.config): Configuration object.
     """
     try:
-        # Initialize logging
+        # Initialize logging, wallet, and subtensor
         bt.logging(config=config)
-        # Initialize wallet and subtensor
         wallet = bt.wallet(config=config)
         subtensor = bt.subtensor(config=config)
-        # Retrieve the metagraph
         metagraph: bt.metagraph = subtensor.metagraph(config.netuid)
         
         # Ensure the wallet is registered
         uid = utils.assert_registered(wallet, metagraph)
-        
         print(metagraph)
 
         csv_data = [["uid", "hf_url", "metric", "value", "stderr", "training_time", "evaluating_time", "total_time"]]
@@ -66,12 +64,11 @@ async def check_commits(config: bt.config):
         for uid in metagraph.uids:
             print(uid)
             try:
-                # Fetch the current commit
+                # Fetch and compare the current commit
                 current_commit = subtensor.get_commitment(netuid=204, uid=uid)
                 print(f"Current commit for uid {uid}: {current_commit}")
 
                 if current_commit is not None:
-                    # Compare with the previous commit
                     previous_commit = previous_commits[config.netuid].get(uid)
                     if previous_commit != current_commit:
                         hf_url = utils.extract_commit(current_commit)
@@ -89,10 +86,10 @@ async def check_commits(config: bt.config):
                                 evaluating_time = time.time() - start_time
                                 print(f"run_lighteval took {evaluating_time:.2f} seconds")
 
-                            print(matches)   
+                            print(matches)
                             for match in matches or []:
                                 metric, value, stderr = match
-                                csv_data.append([uid, hf_url, metric, value, stderr, f"{training_time:.2f}", f"{evaluating_time:.2f}", f"{training_time + evaluating_time:.2f}" ])
+                                csv_data.append([uid, hf_url, metric, value, stderr, f"{training_time:.2f}", f"{evaluating_time:.2f}", f"{training_time + evaluating_time:.2f}"])
                         
                     # Update the stored commit
                     previous_commits[config.netuid][uid] = current_commit
@@ -122,7 +119,6 @@ async def main(config: bt.config):
         await asyncio.sleep(config.interval * 3600)
 
 if __name__ == "__main__":
-    
     # Parse and print configuration
     config = get_config()
     
