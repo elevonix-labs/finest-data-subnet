@@ -146,7 +146,7 @@ def upload_to_hf(hf_repo: str, bucket_name: str, data_url: str) -> bool:
         logging.error(f"An unexpected error occurred: {e}")
     return False
 
-def get_config() -> bt.Config:
+def get_config() -> bt.config:
     """
     Initialize and parse command-line arguments and add Bittensor-specific arguments.
 
@@ -154,10 +154,10 @@ def get_config() -> bt.Config:
         bt.Config: Parsed configuration.
     """
     parser = argparse.ArgumentParser(description="Upload dataset to Hugging Face and commit dataset URL to Bittensor subtensor chain.")
-    parser.add_argument("--netuid", type=str, default="1", help="The unique identifier for the network.")
-    parser.add_argument("--hf_repo", type=str, required=True, help="The Hugging Face repository to upload the dataset.")
-    parser.add_argument('--bucket_name', type=str, required=True, help='Name of the S3 bucket.')
-    parser.add_argument('--data_url', type=str, required=True, help='Path of the dataset in the S3 bucket.')
+    parser.add_argument("--netuid", type=str, default="204", help="The unique identifier for the network.")
+    parser.add_argument("--hf_repo", type=str,  help="The Hugging Face repository to upload the dataset.")
+    parser.add_argument('--bucket_name', type=str,  help='Name of the S3 bucket.')
+    parser.add_argument('--data_url', type=str, help='Path of the dataset in the S3 bucket.')
 
     # Add Bittensor-specific arguments
     bt.wallet.add_args(parser)
@@ -167,7 +167,7 @@ def get_config() -> bt.Config:
     config = bt.config(parser)
     return config
 
-async def main(config: bt.Config):
+async def main(config: bt.config):
     """
     Main function to commit dataset to Bittensor subtensor chain.
 
@@ -198,13 +198,13 @@ async def main(config: bt.Config):
             break
         except Exception as e:
             traceback.print_exc()
-            bt.logging.error(f"Error while committing to subtensor chain: {e}, retrying in 5 seconds...")
-            time.sleep(5)
+            bt.logging.error(f"Error while committing to subtensor chain: {e}, retrying in 300 seconds...")
+            time.sleep(300)
 
 if __name__ == "__main__":
     # Parse and print configuration
     config = get_config()
 
-    if upload_to_hf(config.hf_repo, config.bucket_name, config.data_url):
+    # if upload_to_hf(config.hf_repo, config.bucket_name, config.data_url):
         # Run the main function asynchronously
-        asyncio.run(main(config))
+    asyncio.run(main(config))
