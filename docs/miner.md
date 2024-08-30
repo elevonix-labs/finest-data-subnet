@@ -83,5 +83,5 @@ poetry run python miner/commit_to_chain.py --hf_repo your_hf_repo --bucket_name 
 ```
 Example:
 ```bash
-poetry run python miner/commit_to_chain.py --bucket_name data-refine --data_url minhash/deduped_output --hf_repo cerebromesh/data-refine --wallet.name miner --wallet.hotky default
+poetry run python miner/commit_to_chain.py --bucket_name data-refine --data_url minhash/deduped_output --hf_repo cerebromesh/data-refine --wallet.name miner --wallet.hotkey default
 ```
