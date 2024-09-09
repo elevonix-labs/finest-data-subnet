@@ -56,7 +56,7 @@ async def check_commits(config: bt.config):
         metagraph: bt.metagraph = subtensor.metagraph(config.netuid)
         
         # Ensure the wallet is registered
-        uid = utils.assert_registered(wallet, metagraph)
+        hotkey, uid = utils.assert_registered(wallet, metagraph)
         print(metagraph)
 
         csv_data = [["uid", "hf_url", "metric", "value", "stderr", "training_time", "evaluating_time", "total_time"]]
