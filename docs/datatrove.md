@@ -148,7 +148,10 @@ sudo systemctl start slurmd
 sudo systemctl enable slurmctld
 sudo systemctl start slurmctld
 ```
-
+```bash
+sudo apt update
+sudo apt install slurm-client
+```
 Check slurm using `scontol show nodes`
 If state of node is drained or downed, run  `scontrol update node=head state=RESUME`
 
@@ -170,19 +173,6 @@ python3 --version
 sudo apt update
 sudo apt install -y cmake build-essential libboost-all-dev
 sudo apt install python3 python3.10-venv
-```
-
-You should download the resource manually by running the following python script in your Python environment:
-Add file named `punkt_download.py`
-
-```python
-# punkt_download.py
-import nltk
-nltk.download('punkt')
-```
-Run script
-```bash
-poetry run python miner/punkt_download.py
 ```
 
 ## Running the Script
