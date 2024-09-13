@@ -17,7 +17,7 @@ def assert_registered(wallet: bt.wallet, metagraph: bt.metagraph) -> int:
         f"You are registered with address: {wallet.hotkey.ss58_address} and uid: {uid}"
     )
 
-    return uid
+    return wallet.hotkey.ss58_address, uid
 
 
 def get_hash_of_two_strings(string1: str, string2: str) -> str:
