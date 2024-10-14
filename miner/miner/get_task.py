@@ -12,6 +12,14 @@ def fetch_warc_files(hotkey):
         response.raise_for_status()  # Raise an error for bad responses
         warc_files = response.json().get('warc_paths')  # Assuming the API returns a JSON array of file paths
         return warc_files
-    except requests.RequestException as e:
-        print(f"Error fetching WARC files: {e}")
+    except requests.HTTPError as http_err:
+        if response.status_code in [400, 404]:
+            # Extract the 'detail' from the error response
+            error_detail = response.json().get('detail', 'Unknown error')
+            print(f"Error fetching WARC files: {error_detail}")
+        else:
+            print(f"HTTP error occurred: {http_err}")
+        return []
+    except requests.RequestException as req_err:
+        print(f"Error fetching WARC files: {str(req_err)}")
         return []

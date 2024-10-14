@@ -86,31 +86,24 @@ async def main(config):
         metagraph: bt.metagraph = subtensor.metagraph(config.netuid)
 
         # Ensure the wallet is registered
-        hotkey, uid = utils.assert_registered(wallet, metagraph)
+        hotkey, _ = utils.assert_registered(wallet, metagraph)
 
         warc_files = fetch_warc_files(hotkey)
-        
+        if not warc_files:  
+            bt.logging.info("WARC files not found, waiting for 2 hours before retrying...")
+            await asyncio.sleep(2 * 3600)  
+            continue  
+
         result_path = f"./result"
 
         result = refining(warc_files, result_path, config.total_tasks, config.cpus_per_task, config.limit)
 
         if result:
-            if upload_dataset(result_path, config.hf_repo):  
-                
-                api_url = os.getenv("API_URL")
-                response = requests.post(f"{api_url}/finish-task/",
-                              json={
-                                  "hotkey": hotkey,
-                                  "warc_files": warc_files
-                              })
-                response.raise_for_status()
-
-                hf_url_hash = utils.get_hash_of_two_strings(config.hf_repo, wallet.hotkey.ss58_address)
-
-                # Loop to commit dataset to the subtensor chain, with retry on failure
+            hf_repo_hash = upload_dataset(result_path, config.hf_repo)
+            if hf_repo_hash:
                 while True:
                     try:
-                        subtensor.commit(wallet, config.netuid, f"{hf_url_hash}:{config.hf_repo}")
+                        subtensor.commit(wallet, config.netuid, f"{hf_repo_hash}:{config.hf_repo}")
                         bt.logging.success("🎉 Successfully committed dataset to subtensor chain")
                         break
                     except Exception as e:
@@ -122,7 +115,7 @@ async def main(config):
         end = time.time() - start
         print(f"Processing time: {end:.2f} seconds")
 
-        await asyncio.sleep(10)  # Adjust the delay as needed
+        await asyncio.sleep(8 * 3600) 
 
 if __name__ == "__main__":
 
