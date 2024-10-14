@@ -166,6 +166,10 @@ xxhash = "3.5.0"
 yarl = "1.9.4"
 nanotron = { git = "https://github.com/huggingface/nanotron.git", rev = "03d67f2103d5be0dc15ea6022a6cf16d6a633064" }
 bittensor = "^7.3.1"
+python-dotenv = "^1.0.1"
+boto3 = "^1.35.31"
+warcio = "^1.7.4"
+sentence-transformers = "^3.1.1"
 
 
 [build-system]
