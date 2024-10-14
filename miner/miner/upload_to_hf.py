@@ -1,4 +1,4 @@
-from huggingface_hub import delete_repo
+from huggingface_hub import delete_repo, HfApi
 import os
 import gzip
 import json
@@ -21,16 +21,6 @@ def create_hf_dataset(data):
     dataset_dict = DatasetDict({'train': hf_dataset})
     return dataset_dict
 
-def delete_hf_repo(repo_name, hf_token):
-    """
-    Delete the existing dataset repository on Hugging Face.
-    """
-    try:
-        delete_repo(repo_id=repo_name, token=hf_token)
-        print(f"Successfully cleaned the repository: {repo_name}")
-    except Exception as e:
-        print(f"Failed to clean the repository: {e}")
-
 def upload_to_hf(dataset_dict, repo_name, hf_token):
     """
     Upload dataset to Hugging Face.
@@ -50,9 +40,6 @@ def remove_result_folder(folder_path):
 def upload_dataset(result_path, hf_repo):
     hf_token = os.getenv("HF_TOKEN")
 
-    print("Cleaning the Hugging Face repository...")
-    delete_hf_repo(hf_repo, hf_token)  # Clean the repository before uploading
-
     print("Reading datasets from local path...")
     all_datasets = read_datasets(f'{result_path}/minhash/deduped_output')
 
@@ -60,9 +47,16 @@ def upload_dataset(result_path, hf_repo):
     dataset_dict = create_hf_dataset(all_datasets)
 
     print("Uploading dataset to Hugging Face...")
+
+    api = HfApi()
+    
     if upload_to_hf(dataset_dict, hf_repo, hf_token):
+
+        repo_info = api.dataset_info(hf_repo)
+
         remove_result_folder(result_path)
-        return True
+
+        return repo_info.sha
     else:
         return False
 
@@ -70,4 +64,5 @@ if __name__ == "__main__":
     # Replace these with actual parameters or environment variables
     result_path = "./result"
     hf_repo = "barney49/original_data"
-    upload_dataset(result_path, hf_repo)
+    result = upload_dataset(result_path, hf_repo)
+    print(result)
