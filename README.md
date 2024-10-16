@@ -12,17 +12,10 @@
 </div>
 
 ---
-- [Quickstarter template](#quickstarter-template)
 - [Introduction](#introduction)
-  - [Example](#example)
+- [Main Mechanism](#main-mechanism-of-subnet)
+- [Roadmap](#roadmap)
 - [Installation](#installation)
-  - [Before you proceed](#before-you-proceed)
-  - [Install](#install)
-- [Writing your own incentive mechanism](#writing-your-own-incentive-mechanism)
-- [Writing your own subnet API](#writing-your-own-subnet-api)
-- [Subnet Links](#subnet-links)
-- [License](#license)
-
 ---
 
 ## Introduction
@@ -38,8 +31,8 @@ In our project, we leverage the same algorithm used to create the FineWeb datase
 
 The Data Refine Subnet implements an optimized dataset creation mechanism, featuring the following neuron types:
 
-	•	Miners: Responsible for generating refined datasets from raw crawled data.
-	•	Validators: Tasked with evaluating the performance of miners and ensuring the quality of the datasets produced.
+	- Miners: Responsible for generating refined datasets from raw crawled data.
+	- Validators: Tasked with evaluating the performance of miners and ensuring the quality of the datasets produced.
 
 Both of them are getting rewards via tao according their score and trust in network.
 <div align="center">
@@ -168,7 +161,7 @@ Validators train a small model using the miner’s dataset and assess the datase
 ## Installation
 
 - [Miners](./docs/miner.md)
-- [Validators](./docs/upload_from_s3_to_hf.md)
+- [Validators](./docs/validator.md)
 
 
 
