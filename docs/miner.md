@@ -1,6 +1,6 @@
-# Miner
+# Miners
 
-We use DataTrove, a lightweight yet powerful data refinement library, as the backbone of our data-refine subnet. The miner is responsible for training the data refinement model and submitting it to Huggingface 🤗. You can refer to the training document from the DataTrove repo for the training guideline. We will also provide a detailed training setup here.
+We use [DataTrove](https://github.com/huggingface/datatrove), a lightweight yet powerful data refinement library, as the backbone of our data-refine subnet. The miner is responsible for training the data refinement model and submitting it to Huggingface 🤗. You can refer to the training document from the DataTrove repo for the training guideline. We will also provide a detailed training setup here.
 
 ## Install Dependencies
 
@@ -13,7 +13,7 @@ This installation script should automatically add Poetry to your PATH. If the in
 ```bash
 poetry --version
 ```
-#### Add Poetry to Your PATH Manually
+#### Or you can add Poetry to Your PATH Manually
 - First, locate the Poetry binary:
 ```bash
 echo "$HOME/.local/bin/poetry"
@@ -30,6 +30,7 @@ Now, you should be able to run:
 ```bash
 poetry --version
 ```
+
 ### Installing Dependencies
 
 Ensure you have the required dependencies installed. You can use the following command to install them:
