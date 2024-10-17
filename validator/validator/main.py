@@ -4,15 +4,18 @@ import asyncio
 import csv
 import time
 import argparse
+import numpy as np
+import requests
 from dotenv import load_dotenv
 from collections import defaultdict
 import bittensor as bt
+from bittensor.extrinsics.serving import get_metadata
 from datasets import load_dataset
-import requests
 from config import generate_training_config
 from train import start_training_and_kill
 from evaluate import run_lighteval
 from check import DataProcessor
+from typing import cast, Any 
 
 # Add the directory containing 'utilities' to the system path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
@@ -44,6 +47,18 @@ def get_config():
     config = bt.config(parser)
     return config
 
+
+def calculate_score(time_elapsed, value, stderr, sample_similarities, x=0.5):
+    
+    if all(similarity <= 70 for similarity in sample_similarities):
+        return 0  
+    
+    data_quality = value / (stderr + 1e-8)
+
+    score = (time_elapsed * x) + (data_quality * (1 - x))
+
+    return score
+
 async def fetch_commits(config: bt.config):
     """
     Async task to fetch commits and put them into the commit queue.
@@ -62,17 +77,29 @@ async def fetch_commits(config: bt.config):
 
         while True:
             print("Fetching commits...")
+            
             for uid in metagraph.uids:
                 try:
                     # Fetch the current commit
+
                     current_commit = subtensor.get_commitment(netuid=config.netuid, uid=uid)
-                    print(f"Current commit for uid {uid}: {current_commit}")
                     
                     # Check if commit has changed
-                    if current_commit and current_commit != previous_commits[config.netuid].get(uid):
-                        # Add the commit to the queue for evaluation
-                        await commit_queue.put((uid, current_commit))
-                        previous_commits[config.netuid][uid] = current_commit
+                    if current_commit and current_commit != previous_commits.get(uid):
+
+                        hotkey = metagraph.hotkeys[uid]
+                        metadata = cast(dict[str, Any], get_metadata(subtensor, metagraph.netuid, hotkey))
+                        commit_block = metadata["block"]
+
+                        api_url = os.getenv("API_URL")
+                        response = requests.post(f"{api_url}/finish-task/", json={"uid": int(uid)})
+
+                        if response.status_code == 200:
+
+                            await commit_queue.put((uid, current_commit, commit_block))
+                            previous_commits[uid] = current_commit
+                        else:
+                            print(f"Error: Failed to finish dataset for {uid}. Status code: {response.status}")
 
                 except Exception as e:
                     print(f"Error fetching commit for uid {uid}: {e}")
@@ -89,26 +116,25 @@ async def process_commits(config: bt.config):
     Args:
         config (bt.config): Configuration object.
     """
-    csv_data = [["uid", "hf_url", "metric", "value", "stderr", "training_time", "evaluating_time", "total_time"]]
     
     while True:
         # Get a commit from the queue
-        uid, current_commit = await commit_queue.get()
+        uid, current_commit, commit_block = await commit_queue.get()
 
         try:
             # Extract Hugging Face URL from commit
             hf_url = utils.extract_commit(current_commit)
-            print(f"Processing commit for uid {uid} with hf_url {hf_url}")
 
             api_url = os.getenv("API_URL")
-            response = requests.post(f"{api_url}/check-dataset/", json={"uid": uid})
+            response = requests.post(f"{api_url}/check-dataset/", json={"uid": int(uid)})
             warc_files = response.json().get('warc_files')
+            request_block = response.json().get('request_block')
+            
+            time_elapsed = (commit_block - request_block) * 12
 
             processor = DataProcessor(warc_files=warc_files, hf_url=hf_url, num_samples=30)
-            scores = processor.run()
-            print("Match Scores:", scores)
-
-            print(current_commit)
+            sample_similarities = processor.run()
+            
             if generate_training_config(hf_url):
                 start_time = time.time()
                 training_success = start_training_and_kill('validator/config.yaml', config.world_size)
@@ -123,22 +149,29 @@ async def process_commits(config: bt.config):
                     evaluating_time = time.time() - start_time
                     print(f"run_lighteval took {evaluating_time:.2f} seconds")
 
-                print(matches)
+                values = []
+                stderrs = []
+
                 for match in matches or []:
                     metric, value, stderr = match
-                    csv_data.append([uid, hf_url, metric, value, stderr, f"{training_time:.2f}", f"{evaluating_time:.2f}", f"{training_time + evaluating_time:.2f}"])
+                    if metric == 'truthfulqa_mc2':
+                        values.append(value)
+                        stderrs.append(stderr)
 
-            # Mark task as done
+                # Now calculate the mean for 'truthfulqa_mc2'
+                if values and stderrs:
+                    mean_value = np.mean(values)
+                    mean_stderr = np.mean(stderrs)
+                else:
+                    mean_value = 0.0
+                    mean_stderr = 0.0
+
+                score = calculate_score(time_elapsed, mean_value, mean_stderr, sample_similarities)
+
             commit_queue.task_done()
 
         except Exception as e:
             print(f"Error processing commit for uid {uid}: {e}")
-
-        # Write the accumulated data to a CSV file
-        file_path = "results.csv"
-        with open(file_path, mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerows(csv_data)
 
 async def main(config: bt.config):
     """
