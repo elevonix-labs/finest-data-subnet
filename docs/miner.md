@@ -2,6 +2,20 @@
 
 We use [DataTrove](https://github.com/huggingface/datatrove), a lightweight yet powerful data refinement library, as the backbone of our data-refine subnet. The miner is responsible for training the data refinement model and submitting it to Huggingface 🤗. You can refer to the training document from the DataTrove repo for the training guideline. We will also provide a detailed training setup here.
 
+## System and Hardware Requirements
+
+### 1. **Hardware Requirements**
+#### Recommended Hardware:
+- **CPU**: As many as possible( 40-core processor or higher recommended)
+- **RAM**: 128 GB or higher
+- **Storage**: 256 GB free disk space for dataset storage and processing
+
+### 2. **Software Requirements**
+- **Operating System** (Ubuntu 22.04.04+ recommended)
+- **Python Version** (Python 3.10 + recommended)
+- **Poetry**: For managing project dependencies and running scripts. (Refer to the [Installation Guide](#installing-poetry))
+- **Git**: Version control system for managing code repositories.
+
 ## Install Dependencies
 
 ### Installing Poetry

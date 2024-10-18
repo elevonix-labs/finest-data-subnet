@@ -2,6 +2,24 @@
 
 This script is designed to commit datasets to the Bittensor subtensor chain. It initializes and parses command-line arguments, sets up the wallet and subtensor, and retrieves and processes datasets from the Bittensor metagraph.
 
+## System and Hardware Requirements
+
+### 1. **Hardware Requirements**
+#### Recommended Hardware:
+- **CPU**: AMD Ryzen 7 or Ryzen 9
+- **RAM**: 128 GB or higher
+- **Storage**: 500 GB free disk space for dataset storage and processing
+- **GPU**:
+  - **Model**: NVIDIA RTX 3080/3090 or NVIDIA A40
+  - **Memory**: Minimum 8 GB of VRAM
+  - **Count**: 4 + (Recommended)
+
+### 2. **Software Requirements**
+- **Operating System** (Ubuntu 22.04.04+ recommended)
+- **Python Version** (Python 3.10 + recommended)
+- **Poetry**: For managing project dependencies and running scripts. (Refer to the [Installation Guide](#installing-poetry))
+- **Git**: Version control system for managing code repositories.
+
 ## Install Dependencies
 
 ### Installing Poetry
