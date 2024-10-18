@@ -47,13 +47,7 @@ poetry run pip install flash-attn
 
 Make sure you have the necessary environment setup. You should have a Bittensor wallet and access to the Bittensor subtensor chain.
 
-### 2. Configuration
-
-The script uses command-line arguments for configuration. The main arguments include:
-```ini
-HF_TOKEN=
-```
-### 3. Running the Script
+### 2. Running the Script
 
 You can run the script using the following command:
 
