@@ -125,14 +125,14 @@ Validators train a small model using the miner’s dataset and assess the datase
 
 - [x] Project Overview Documentation
     - [x] Develop a comprehensive introduction to the project, covering the vision, architecture, and objectives.
-    - [ ] Include diagrams and flowcharts to explain the role of miners, validators, the task server, and the decentralized mechanisms.
+    - [x] Include diagrams and flowcharts to explain the role of miners, validators, the task server, and the decentralized mechanisms.
 - [ ] Subnet and Task Server Documentation
     - [ ] The process of task retrieval and submission.
     - [ ] Communication between miners and validators.
     - [ ] Blockchain integration for task tracking and rewards distribution.
     - [ ] Create a task server setup guide, including API documentation for developers to integrate with the system.
 - [ ] Miner and Validator Onboarding Guide
-    - [ ] Create a step-by-step guide for new miners to set up their nodes, retrieve tasks, process datasets, and submit them to Hugging Face.
+    - [x] Create a step-by-step guide for new miners to set up their nodes, retrieve tasks, process datasets, and submit them to Hugging Face.
     - [ ] Write detailed documentation on how validators can evaluate miner performance, check dataset quality, and assign scores.
     - [ ] Include troubleshooting sections to address common setup or performance issues.
 
@@ -148,6 +148,9 @@ Validators train a small model using the miner’s dataset and assess the datase
     - [ ] Explore potential collaborations with academic institutions or AI research labs.
 
 ### Phase 6: Continuous Improvement and Version 2.0
+- [ ] Update logging system
+    - [ ] Wandb logs for validators and miners.
+    - [ ] Save states for keeping states even if validator or miner is restarted suddenly.
 - [ ] Dataset Expansion
     - [ ] Continue improving the dataset by increasing token count and refining quality.
     - [ ] Introduce other data sources besides CommonCrawl to diversify the dataset.
