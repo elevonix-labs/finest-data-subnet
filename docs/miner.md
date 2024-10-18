@@ -2,6 +2,20 @@
 
 We use [DataTrove](https://github.com/huggingface/datatrove), a lightweight yet powerful data refinement library, as the backbone of our data-refine subnet. The miner is responsible for training the data refinement model and submitting it to Huggingface 🤗. You can refer to the training document from the DataTrove repo for the training guideline. We will also provide a detailed training setup here.
 
+## System and Hardware Requirements
+
+### 1. **Hardware Requirements**
+#### Recommended Hardware:
+- **CPU**: As many as possible( 40-core processor or higher recommended)
+- **RAM**: 128 GB or higher
+- **Storage**: 256 GB free disk space for dataset storage and processing
+
+### 2. **Software Requirements**
+- **Operating System** (Ubuntu 22.04.04+ recommended)
+- **Python Version** (Python 3.10 + recommended)
+- **Poetry**: For managing project dependencies and running scripts. (Refer to the [Installation Guide](#installing-poetry))
+- **Git**: Version control system for managing code repositories.
+
 ## Install Dependencies
 
 ### Installing Poetry
@@ -43,18 +57,8 @@ poetry install
 ### 1. Prepare the Environment
 Make sure you have access to an S3 bucket where the data is stored and where the outputs will be saved. Also, ensure you have a Slurm-based HPC system for running the pipeline.
 If you are not familiar with Slurm, please refer to [datatrove.md](datatrove.md).
-Also make sure you have a `.env` file in the same directory as your script with the following environment variables set:
-```ini
-AWS_ACCESS_KEY_ID=your_aws_access_key_id
-AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
-AWS_DEFAULT_REGION=your_aws_region
-```
-You can refer to .env.sample
-### 2. Prepare the Dataset
-The dataset should be stored in an S3 bucket. The data URL should point to the prefix where the WARC files are stored.
-You can manage your data efficiently on our site [data-manage.cerebromesh.io](https://data-manage.cerebromesh.io).
 
-### 3. Run the Pipeline
+### 2. Run the Pipeline
 You can run the pipeline using the provided script. Here's an example command to execute the script:
 ```bash
 poetry run python miner/main.py --hf_repo your_hf_repo --wallet.name your_wallet_name --wallet.hotkey your_wallet_hotkey [--total_tasks total_task] [--cpus_per_task your_cpus_number] [--limit limit_per_task]
