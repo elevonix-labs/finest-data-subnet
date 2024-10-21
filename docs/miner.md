@@ -55,7 +55,7 @@ poetry install
 ## Making Datasets
 
 ### 1. Prepare the Environment
-Make sure you have access to an S3 bucket where the data is stored and where the outputs will be saved. Also, ensure you have a Slurm-based HPC system for running the pipeline.
+Ensure you have a Slurm-based HPC system for running the pipeline.
 If you are not familiar with Slurm, please refer to [datatrove.md](datatrove.md).
 
 ### 2. Run the Pipeline

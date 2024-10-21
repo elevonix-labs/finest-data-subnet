@@ -6,31 +6,6 @@ This repository contains the code used to process and create the FineWeb dataset
 
 Before running the script, ensure you have the necessary packages and configurations set up.
 
-### AWS Configuration
-
-Make sure you have AWS configured with the necessary credentials. Update or create the following files:
-
-#### `~/.aws/config`
-
-```
-[default]
-region = us-west-2
-output = json
-```
-
-#### `~/.aws/credentials`
-
-```
-[default]
-aws_access_key_id = YOUR_ACCESS_KEY
-aws_secret_access_key = YOUR_SECRET_KEY
-```
-
-Check aws config using `aws s3 ls`, after install `awscli`.
-Install it with `apt install awscli` 
-
-Also create s3 bucket for saving dataset, you can follow this [docs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html).
-
 ### Install SLURMDBD and configuration
 
 - Install Required Dependencies
