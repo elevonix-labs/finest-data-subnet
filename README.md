@@ -14,7 +14,7 @@
 ---
 - [Introduction](#introduction)
 - [Main Mechanism](#main-mechanism-of-subnet)
-- [Roadmap](#roadmap)
+- [Roadmap](roadmap.md)
 - [Installation](#installation)
 ---
 
@@ -51,11 +51,12 @@ Miners receive tasks from the task server via the task retrieval API. The task s
 
 Validators periodically check miners’ commits every x blocks to retrieve new submissions. They then evaluate the elapsed time and the quality of the resulting dataset. Based on the miner’s performance, the validators assign weights according to the miners’ scores.
 
-```
+```text
 -- how to evaluate dataset --
 
-Validators train a small model using the miner’s dataset and assess the dataset quality based on the model’s accuracy. If the trained model performs well, it indicates that the dataset is of high quality. Conversely, if the model performs poorly, it suggests that the dataset quality is suboptimal. This method allows for an effective evaluation of the dataset quality.
-
+Validators train a small model using the miner’s dataset and assess the dataset quality based on the model’s accuracy.
+If the trained model performs well, it indicates that the dataset is of high quality. Conversely, if the model performs poorly, it suggests that the dataset quality is suboptimal.
+This method allows for an effective evaluation of the dataset quality.
 ```
 
 <div align="center">
@@ -69,106 +70,10 @@ Validators train a small model using the miner’s dataset and assess the datase
 </p>
 
 
-## Roadmap
-
-### Phase 1: Architecture & Subnet Design
-
-- [x] Design Data Refine Subnet
-    - [x] Miner Node Design
-    Create miner nodes that retrieve raw CommonCrawl data, process tasks, and generate refined datasets.
-    - [x] Validator Node Design
-    Build validator nodes to evaluate the performance of miners by checking dataset quality based onmodel training results.
-- [x] Task Server and API Development
-    - [x] Build the task server responsible for distributing dataset creation tasks to miners.
-    - [x] Develop the task retrieval API to manage communication between the server, miners, and validators.
-- [x] Blockchain Integration
-    - [x] Implement the mechanism for miners to submit commits (with Huggingface URLs) and validators to record evaluations on the blockchain.
-    - [x] Set up scoring and rewarding systems which distribute Tao tokens based on performance metrics.
-
-### Phase 2: Development and Testing
-
-- [x] Develop Miner and Validator Nodes
-    - [x] Write the core code for miners to retrieve, process, and upload datasets.
-    - [x] Write code for validators to retrieve commits, check dataset quality, and assign scores.
-- [x] Dataset Quality Evaludation Algorithm
-    - [x] Implement the model training and accuracy assessment algorithm for validators to judge dataset quality effectively.
-- [x] Prototype Testing
-    - [x] Conduct small-scale tests with miners and validators on the Bittensor test network.
-    - [x] Assess the scalability of the system, including data retrieval, processing speed, and evaluation accuracy.
-- [ ] Reward Mechanism Deployment
-    - [ ] Deploy mechanism for distributing rewards in Tao tokens, ensuring fairness and transparency in payouts.
-
-### Phase 3: Website Development
-
-- [x] Website Architecture and Design
-    - [x] Design a user-friendly interface showcasing an overview of the Data Refine Subnet, with clear navigation for key features (e.g., subnet performance, miner/validator statistics, etc.).
-    - [x] Create wireframes and mockups for the website, ensuring responsiveness across all devices.
-    - [x] Define the technology stack for the website (e.g., React, Next.js, Tailwind CSS, or other frameworks based on your needs).
-- [ ] Subnet Overview Page
-    - [x] Dataset creation progress (e.g., tokens generated, dataset size).
-    - [ ] Number of active miners and validators.
-    - [ ] Task server activity and status tracking.
-- [ ] Miner and Validator Leaderboards.
-    - [ ] Performance metrics: Dataset quality score, token rewards, time to complete tasks.
-    - [ ] Ranking system: Display top-performing miners and validators.
-- [ ] API Integration and Data Visualization
-    - [ ] Integrate APIs to retrieve real-time data from the blockchain and display metrics like rewards, performance, and task completion rates.
-    - [ ] Use data visualization tools (e.g., charts, graphs) to show trend analytics over time.
-- [ ] User Interaction and Community Features
-    - [ ] Enable user registration and create a dashboard for miners and validators to view personal stats.
-    - [ ] Add a community forum or discussion section for miners and validators to exchange ideas and report bugs.
-- [ ] Security and Authentication
-    - [ ] Ensure secure access to sensitive data with proper authentication mechanisms (OAuth, JWT).
-    - [ ] Add secure access points for miners and validators to update their profiles, task completions, and repositories.
-
-### Phase 4: Document Development
-
-- [x] Project Overview Documentation
-    - [x] Develop a comprehensive introduction to the project, covering the vision, architecture, and objectives.
-    - [x] Include diagrams and flowcharts to explain the role of miners, validators, the task server, and the decentralized mechanisms.
-- [ ] Subnet and Task Server Documentation
-    - [ ] The process of task retrieval and submission.
-    - [ ] Communication between miners and validators.
-    - [ ] Blockchain integration for task tracking and rewards distribution.
-    - [ ] Create a task server setup guide, including API documentation for developers to integrate with the system.
-- [ ] Miner and Validator Onboarding Guide
-    - [x] Create a step-by-step guide for new miners to set up their nodes, retrieve tasks, process datasets, and submit them to Hugging Face.
-    - [ ] Write detailed documentation on how validators can evaluate miner performance, check dataset quality, and assign scores.
-    - [ ] Include troubleshooting sections to address common setup or performance issues.
-
-### Phase 5: Launch and Community Engagement
-- [ ] Mainnet Deployment
-    - [ ] Move the system from the testnet to the mainnet, ensuring stability and readiness for full-scale use.
-    - [ ] Announce the official launch of the dataset creation mechanism.
-- [ ] Community Building and Onboarding
-    - [ ] Engage with the developer and data science communities to onboard miners and validators.
-    - [ ] Organize webinars and tutorials on how to contribute to the network.
-- [ ] Partnerships and Expansion
-    - [ ] Establish partnerships with organizations that require large-scale datasets for AI models. (e.g. Pretraining Subnet)
-    - [ ] Explore potential collaborations with academic institutions or AI research labs.
-
-### Phase 6: Continuous Improvement and Version 2.0
-- [ ] Update logging system
-    - [ ] Wandb logs for validators and miners.
-    - [ ] Save states for keeping states even if validator or miner is restarted suddenly.
-- [ ] Dataset Expansion
-    - [ ] Continue improving the dataset by increasing token count and refining quality.
-    - [ ] Introduce other data sources besides CommonCrawl to diversify the dataset.
-- [ ] AI Integration and Automation
-    - [ ] Explore opportunities for automating certain aspects of dataset generation and validation using AI.
-    - [ ] Potentially introduce advanced algorithms for refining the data even further.
-- [ ] Performance and Feedback Loop
-    - [ ] Regularly evaluate miner and validator performance and tweak the reward mechanisms as needed.
-    - [ ] Collect feedback from network participants and use it to improve future versions of the platform.
-
 ## Installation
 
 - [Miners](./docs/miner.md)
 - [Validators](./docs/validator.md)
-
-
-
-
 
 
 ## License
