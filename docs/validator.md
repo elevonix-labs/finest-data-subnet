@@ -5,7 +5,9 @@ This script is designed to commit datasets to the Bittensor subtensor chain. It 
 ## System and Hardware Requirements
 
 ### 1. **Hardware Requirements**
-#### Recommended Hardware:
+
+#### Recommended Hardware
+
 - **CPU**: AMD Ryzen 7 or Ryzen 9
 - **RAM**: 128 GB or higher
 - **Storage**: 500 GB free disk space for dataset storage and processing
@@ -15,6 +17,7 @@ This script is designed to commit datasets to the Bittensor subtensor chain. It 
   - **Count**: 4 + (Recommended)
 
 ### 2. **Software Requirements**
+
 - **Operating System** (Ubuntu 22.04.04+ recommended)
 - **Python Version** (Python 3.10 + recommended)
 - **Poetry**: For managing project dependencies and running scripts. (Refer to the [Installation Guide](#installing-poetry))
@@ -23,42 +26,60 @@ This script is designed to commit datasets to the Bittensor subtensor chain. It 
 ## Install Dependencies
 
 ### Installing Poetry
-#### First, make sure you have Poetry installed. If not, install it using:
+
+#### First, make sure you have Poetry installed. If not, install it using
+
 ```bash
 curl -sSL https://install.python-poetry.org | python3 -
 ```
+
 This installation script should automatically add Poetry to your PATH. If the installation was successful, try running:
+
 ```bash
 poetry --version
 ```
+
 #### Add Poetry to Your PATH Manually
+
 - First, locate the Poetry binary:
+
 ```bash
 echo "$HOME/.local/bin/poetry"
 ```
+
 - Add the Poetry binary directory to your PATH by editing your shell configuration file `nano ~/.bashrc`, `~/.zshrc`, or `~/.profile`
+
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
 ```
+
 - After adding it to your PATH, apply the changes:
+
 ```bash
 source ~/.bashrc
 ```
+
 Now, you should be able to run:
+
 ```bash
 poetry --version
 ```
+
 ### Installing Dependencies
 
 Ensure you have the required dependencies installed. You can use the following command to install them:
+
 ```bash
 cd validator
 poetry install
 ```
+
 You need to install specific packages, such as `flash-attn` using the following command:
+
 ```bash
 poetry run pip install flash-attn
 ```
+
 ## Getting Commit
 
 ### 1. Prepare the Environment
@@ -72,7 +93,9 @@ You can run the script using the following command:
 ```bash
 poetry run python validator/main.py --netuid netuid --wallet.name your_wallet_name --wallet.hotkey wallet_hotkey --subtensor.network test [--world_size gpu_count]
 ```
+
 Example
+
 ```bash
 poetry run python validator/main.py --netuid 204 --wallet.name validator1 --wallet.hotkey validator1 --subtensor.network test
 ```

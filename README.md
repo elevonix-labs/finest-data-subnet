@@ -1,38 +1,39 @@
 <div align="center">
 
-# **Data Refine Subnet** <!-- omit in toc -->
+# **FineWeb τ** <!-- omit in toc -->
+
 [![Discord Chat](https://img.shields.io/discord/308323056592486420.svg)](https://discord.gg/bittensor)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## Refining Dataset powered by Decentralized network <!-- omit in toc -->
+## Dataset refine powered by Bittensor, a decentralized network <!-- omit in toc -->
 
 [Discord](https://discord.gg/bittensor) • [Network](https://taostats.io/) • [Research](https://bittensor.com/whitepaper)
 </div>
 
 ---
+
 - [Introduction](#introduction)
 - [Main Mechanism](#main-mechanism-of-subnet)
 - [Roadmap](roadmap.md)
 - [Installation](#installation)
+
 ---
 
 ## Introduction
 
 **IMPORTANT**: If you are new to Bittensor subnets, read about [Bittensor Network](https://bittensor.com/whitepaper) and feel the power.  
 
-
-
 The performance of large language models (LLMs) is significantly influenced by the quality and scale of their pretraining datasets. While the pretraining datasets for cutting-edge open LLMs like LLaMA 3 and Mixtral are not publicly available, and little is known about their creation, a new large-scale dataset, [FineWeb](https://huggingface.co/datasets/HuggingFaceFW/fineweb), has recently emerged. FineWeb consists of 15 trillion tokens (44TB of disk space) derived from 96 snapshots of [CommonCrawl](https://commoncrawl.org/), and has demonstrated superior performance compared to other open pretraining datasets.
 Here's the related blog post - [https://huggingface.co/spaces/HuggingFaceFW/blogpost-fineweb-v1](https://huggingface.co/spaces/HuggingFaceFW/blogpost-fineweb-v1)
 
 In our project, we leverage the same algorithm used to create the FineWeb dataset to build our own, even larger, and higher-performing dataset. This dataset will be enhanced and powered by the decentralized Bittensor network.
 
-The Data Refine Subnet implements an optimized dataset creation mechanism, featuring the following neuron types:
+The **FineWeb τ** subnet implements an optimized dataset creation mechanism, featuring the following neuron types:
 
-	- Miners: Responsible for generating refined datasets from raw crawled data.
-	- Validators: Tasked with evaluating the performance of miners and ensuring the quality of the datasets produced.
+- Miners: Responsible for generating refined datasets from raw crawled data.
+- Validators: Tasked with evaluating the performance of miners and ensuring the quality of the datasets produced.
 
 Both of them are getting rewards via tao according their score and trust in network.
 <div align="center">
@@ -69,15 +70,15 @@ This method allows for an effective evaluation of the dataset quality.
    Machanism Diagram
 </p>
 
-
 ## Installation
 
 - [Miners](./docs/miner.md)
 - [Validators](./docs/validator.md)
 
-
 ## License
+
 This repository is licensed under the MIT License.
+
 ```text
 # The MIT License (MIT)
 # Copyright © 2023 Yuma Rao

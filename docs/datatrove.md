@@ -9,18 +9,23 @@ Before running the script, ensure you have the necessary packages and configurat
 ### Install SLURMDBD and configuration
 
 - Install Required Dependencies
+
 ```bash
 sudo apt update
 sudo apt upgrade -y
 sudo apt install mariadb-server
 ```
+
 - Configure mariadb
+
 ```bash
 sudo systemctl start mariadb
 sudo systemctl enable mariadb
 sudo mysql_secure_installation
 ```
+
 - Create SLURM database and User
+
 ```bash
 sudo mysql -u root -p
 
@@ -30,9 +35,11 @@ GRANT ALL PRIVILEGES ON slurm_acct_db.* TO 'slurm'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 ```
+
 ```bash
 sudo apt install slurmdbd slurm-wlm
 ```
+
 ```bash
 sudo nano /etc/slurm/slurmdbd.conf
 ```
@@ -55,7 +62,9 @@ sudo chmod 600 /etc/slurm/slurmdbd.conf
 sudo systemctl enable slurmdbd
 sudo systemctl start slurmdbd
 ```
+
 - Verify the slurmdbd installation
+
 ```bash
 sudo systemctl status slurmdbd
 ```
@@ -68,7 +77,9 @@ sudo systemctl status slurmdbd
 sudo apt update
 sudo apt install slurm slurmd slurmctld slurm-client
 ```
+
 - Configure munge
+
 ```bash
 sudo apt install build-essential munge libmunge-dev libmunge2 libssl-dev
 
@@ -80,12 +91,15 @@ sudo systemctl start munge
 ```
 
 - Set hostname
+
 ```bash
 sudo hostnamectl set-hostname head
 ```
+
 ```bash
 sudo nano /etc/hosts
 ```
+
 Add line for host `127.0.0.1 head`
 
 - Configure slurm
@@ -93,8 +107,8 @@ Add line for host `127.0.0.1 head`
 ```bash
 sudo nano /etc/slurm/slurm.conf
 ```
-**Note: You need to check your server specifications using the `lscpu` and `free -m` command.**
 
+**Note: You need to check your server specifications using the `lscpu` and `free -m` command.**
 
 ```ini
 # slurm.conf
@@ -115,28 +129,32 @@ NodeName=head CPUs=32 Sockets=1 CoresPerSocket=16 ThreadsPerCore=2 RealMemory=10
 # Partitions Configuration
 PartitionName=hopper-cpu Nodes=head Default=YES MaxTime=INFINITE State=UP OverSubscribe=Force
 ```
+
 For `RealMemory` input the total value of `free -m` command.
-From `lscpu`, You can get the values `CPU(s):`, `Core(s) per socket:`, ` Thread(s) per core`, `Socket(s):`
+From `lscpu`, You can get the values `CPU(s):`, `Core(s) per socket:`, `Thread(s) per core`, `Socket(s):`
+
 ```bash
 sudo systemctl enable slurmd
 sudo systemctl start slurmd
 sudo systemctl enable slurmctld
 sudo systemctl start slurmctld
 ```
+
 ```bash
 sudo apt update
 sudo apt install slurm-client
 ```
+
 Check slurm using `scontol show nodes`
 If state of node is drained or downed, run  `scontrol update node=head state=RESUME`
 
 Also if you change slurm conf in the future, you should reconfigure and restart slurmd
+
 ```bash
 slurmd reconfigure
 sudo systemctl restart slurmd
 sudo systemctl restart slurmctld
 ```
-
 
 ### Python Dependencies
 
@@ -155,12 +173,14 @@ sudo apt install python3 python3.10-venv
 After setting up the configurations and installing the required packages, you can run fineweb.py script in miner as follows:
 
 ### Usage
+
 To run the script, use the following command:
 
 ```bash
 poetry run python miner/fineweb.py --bucket_name BUCKET_NAME --data_url DATA_URL [--total_tasks TOTAL_TASKS] [--cpus_per_task CPUS_PER_TASK] [--limit LIMIT]
 
 ```
+
 ### Arguments
 
 Arguments
