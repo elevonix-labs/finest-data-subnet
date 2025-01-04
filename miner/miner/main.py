@@ -17,10 +17,9 @@ import os
 import bittensor as bt
 import nltk
 import time
-import requests
 from miner.get_task import fetch_warc_files
 from miner.upload_to_hf import upload_dataset
-from miner.refining_dataset import refining
+from miner.refining_dataset import DataRefiner
 import asyncio
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
@@ -42,7 +41,7 @@ def get_config() -> bt.config:
     """
     parser = argparse.ArgumentParser(description="Upload dataset to Hugging Face and commit dataset URL to Bittensor subtensor chain.")
     # parser.add_argument("--hf_repo", type=str,  help="The Hugging Face repository to upload the dataset.")
-    parser.add_argument("--netuid", type=str, default=204, help="The unique identifier for the network.")
+    parser.add_argument("--netuid", type=str, default=250, help="The unique identifier for the network.")
     parser.add_argument("--hf_repo", type=str, help="Link to the repo on huggingface.")
     parser.add_argument('--total_tasks', type=int, default=4, help='Total number of tasks')
     parser.add_argument('--cpus_per_task', type=int, default=32, help='Number of CPUs per task')
@@ -55,15 +54,6 @@ def get_config() -> bt.config:
 
     config = bt.config(parser)
     return config
-
-
-async def main(config):
-    """
-    Main function to commit dataset to Bittensor subtensor chain.
-
-    Args:
-        config (bt.Config): Configuration object.
-    """
 
 async def main(config):
     """
@@ -89,20 +79,26 @@ async def main(config):
         hotkey, _ = utils.assert_registered(wallet, metagraph)
 
         warc_files = fetch_warc_files(hotkey)
+
         if not warc_files:  
             bt.logging.info("WARC files not found, waiting for 2 hours before retrying...")
             await asyncio.sleep(2 * 3600)  
             continue  
 
         result_path = f"./result"
+        refiner = DataRefiner(warc_files, result_path, config.total_tasks, config.cpus_per_task, config.limit)
+        processing_success = refiner.refine()
 
-        result = refining(warc_files, result_path, config.total_tasks, config.cpus_per_task, config.limit)
+        if processing_success:
 
-        if result:
+            bt.logging.success("🎉 Data processing completed successfully")
+
             hf_repo_hash = upload_dataset(result_path, config.hf_repo)
+            
             if hf_repo_hash:
                 while True:
                     try:
+                        print(f"{hf_repo_hash}:{config.hf_repo}")
                         subtensor.commit(wallet, config.netuid, f"{hf_repo_hash}:{config.hf_repo}")
                         bt.logging.success("🎉 Successfully committed dataset to subtensor chain")
                         break
