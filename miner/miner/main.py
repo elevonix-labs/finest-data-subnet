@@ -54,7 +54,9 @@ def get_config() -> bt.config:
 
     config = bt.config(parser)
     return config
-
+def remove_result_folder(folder_path):
+    shutil.rmtree(folder_path)
+    print(f"Folder '{folder_path}' removed successfully.")
 async def main(config):
     """
     Main function to commit dataset to Bittensor subtensor chain.
@@ -62,7 +64,7 @@ async def main(config):
     Args:
         config (bt.Config): Configuration object.
     """
-
+    print(f"bittensor version: {bt.__version__}")
     while True:  # Infinite loop to keep the script running continuously
         start = time.time()
         # Initialize logging
@@ -86,6 +88,9 @@ async def main(config):
             continue  
 
         result_path = f"./result"
+        # Remove result path if it already exists
+        if os.path.exists(result_path):
+            remove_result_folder(result_path)
         refiner = DataRefiner(warc_files, result_path, config.total_tasks, config.cpus_per_task, config.limit)
         processing_success = refiner.refine()
 
