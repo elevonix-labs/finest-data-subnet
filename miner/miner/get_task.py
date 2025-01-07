@@ -5,7 +5,7 @@ def fetch_warc_files(hotkey):
     """Fetches warc file paths from the API."""
     try:
         api_url = os.getenv("API_URL")
-        response = requests.post(f"{api_url}/get-task/",
+        response = requests.post(f"{api_url}/subnets/get-task/",
                                  json={
                                      "hotkey": hotkey,
                                  })
@@ -26,7 +26,7 @@ def fetch_warc_files(hotkey):
 
 def send_finish_request(hotkey):
     api_url = os.getenv("API_URL")
-    response = requests.post(f"{api_url}/finish-task/", json={"hotkey": hotkey})
+    response = requests.post(f"{api_url}/subnets/finish-task/", json={"hotkey": hotkey})
     response.raise_for_status()
     if response.status_code == 200:
         print(f"Finished task for hotkey: {hotkey}")

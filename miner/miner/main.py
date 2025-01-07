@@ -58,6 +58,7 @@ def get_config() -> bt.config:
 def remove_result_folder(folder_path):
     shutil.rmtree(folder_path)
     print(f"Folder '{folder_path}' removed successfully.")
+
 async def main(config):
     """
     Main function to commit dataset to Bittensor subtensor chain.
