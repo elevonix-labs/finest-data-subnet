@@ -17,10 +17,11 @@ import os
 import bittensor as bt
 import nltk
 import time
-from miner.get_task import fetch_warc_files
+from miner.get_task import fetch_warc_files, send_finish_request
 from miner.upload_to_hf import upload_dataset
 from miner.refining_dataset import DataRefiner
 import asyncio
+import shutil
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
@@ -112,6 +113,8 @@ async def main(config):
                         traceback.print_exc()
                         bt.logging.error(f"Error while committing to subtensor chain: {e}, retrying in 300 seconds...")
                         await asyncio.sleep(300)
+                
+                send_finish_request(hotkey)
 
         end = time.time() - start
         print(f"Processing time: {end:.2f} seconds")
