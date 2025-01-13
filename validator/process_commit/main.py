@@ -9,6 +9,7 @@ def process_commits(redis_queue: redis.Redis):
     Async task to process commits from the queue.
 
     """
+    redis_queue.delete("commit_queue")
 
     while True:
         try:
@@ -20,8 +21,8 @@ def process_commits(redis_queue: redis.Redis):
                 commit_block = commit_data['commit_block']
                 hf_url = extract_commit(current_commit)
                 print(hf_url)
-                response = requests.post(f"{os.getenv('API_URL')}/check-dataset/", json={"uid": int(uid)})
-                print(response)
+                # response = requests.post(f"{os.getenv('API_URL')}/check-dataset/", json={"uid": int(uid)})
+                # print(response)
             else:
                 print("No commit found")
         except Exception as e:

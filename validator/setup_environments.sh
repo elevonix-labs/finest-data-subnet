@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd validator/fetch_commit
+cd fetch_commit
 poetry install
 cd ..
 
