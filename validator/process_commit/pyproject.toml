@@ -10,6 +10,12 @@ package-mode = false
 python = "^3.10"
 redis = "^5.2.1"
 requests = "^2.32.3"
+warcio = "^1.7.5"
+boto3 = "^1.35.97"
+pandas = "^2.2.3"
+datasets = "^3.2.0"
+nltk = "^3.9.1"
+tokenizers = "^0.21.0"
 
 [build-system]
 requires = ["poetry-core"]
