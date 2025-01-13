@@ -16,6 +16,11 @@ pandas = "^2.2.3"
 datasets = "^3.2.0"
 nltk = "^3.9.1"
 tokenizers = "^0.21.0"
+nanotron = { git = "https://github.com/huggingface/nanotron.git", rev = "03d67f2103d5be0dc15ea6022a6cf16d6a633064" }
+transformers = "^4.48.0"
+torch = ">=1.13.1"
+numpy="<2"
+setuptools = "^75.8.0"
 
 [build-system]
 requires = ["poetry-core"]

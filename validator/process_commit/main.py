@@ -5,6 +5,9 @@ import requests
 import os
 from utils import extract_commit
 from check_similarity import DataProcessor
+from config import generate_training_config
+from training import start_training_and_kill
+
 def process_commits(redis_queue: redis.Redis):
     """
     Async task to process commits from the queue.
@@ -28,7 +31,9 @@ def process_commits(redis_queue: redis.Redis):
                 request_block = data.get('request_block')
                 data_processor = DataProcessor(warc_files, hf_url)
                 sample_similarities = data_processor.run()
-
+                if generate_training_config(hf_url):
+                        training_success = start_training_and_kill('config.yaml', 1)
+                        print(training_success)
             else:
                 print("No commit found")
         except Exception as e:
