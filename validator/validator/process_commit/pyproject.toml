@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "process-commit"
+version = "0.1.0"
+description = ""
+authors = ["barneylogo <ben.amwithyou@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+redis = "^5.2.1"
+requests = "^2.32.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

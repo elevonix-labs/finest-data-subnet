@@ -71,13 +71,10 @@ Ensure you have the required dependencies installed. You can use the following c
 
 ```bash
 cd validator
-poetry install
+./setup_environments.sh
+
 ```
 
-You need to install specific packages, such as `flash-attn` using the following command:
-
-```bash
-poetry run pip install flash-attn
 ```
 
 ## Getting Commit
