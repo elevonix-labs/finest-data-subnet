@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "process-commit"
+version = "0.1.0"
+description = ""
+authors = ["barneylogo <ben.amwithyou@gmail.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+redis = "^5.2.1"
+requests = "^2.32.3"
+warcio = "^1.7.5"
+boto3 = "^1.35.97"
+pandas = "^2.2.3"
+datasets = "^3.2.0"
+nltk = "^3.8.1"
+tokenizers = "^0.21.0"
+nanotron = { git = "https://github.com/huggingface/nanotron.git", rev = "03d67f2103d5be0dc15ea6022a6cf16d6a633064" }
+transformers = "^4.48.0"
+torch = ">=1.13.1"
+numpy="<2"
+setuptools = "^75.8.0"
+lighteval = {git = "https://github.com/huggingface/lighteval", rev = "cf87de993bf5f90120f8d630cc7bbcedd02bcd4c"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

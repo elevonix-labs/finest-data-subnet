@@ -75,6 +75,14 @@ cd validator
 
 ```
 
+### Running  Redis
+We should have redis running on the machine.
+
+```bash
+sudo apt update
+sudo apt install redis-server
+
+sudo service redis-server start
 ```
 
 ## Getting Commit
@@ -88,11 +96,11 @@ Make sure you have the necessary environment setup. You should have a Bittensor 
 You can run the script using the following command:
 
 ```bash
-poetry run python validator/main.py --netuid netuid --wallet.name your_wallet_name --wallet.hotkey wallet_hotkey --subtensor.network test [--world_size gpu_count]
+poetry run python main.py --netuid netuid --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey --subtensor.network test [--world_size gpu_count]
 ```
 
 Example
 
 ```bash
-poetry run python validator/main.py --netuid 204 --wallet.name validator1 --wallet.hotkey validator1 --subtensor.network test
+poetry run python main.py --netuid 250 --wallet_name test-validator --wallet_hotkey h1 --subtensor_network test
 ```

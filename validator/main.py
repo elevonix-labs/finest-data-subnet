@@ -10,13 +10,13 @@ def run_fetch_commits(args=None):
                '--wallet.hotkey', args.wallet_hotkey,
                '--subtensor.network', args.subtensor_network
                ]
-    subprocess.run(command, check=True, cwd='validator/fetch_commit')
+    subprocess.run(command, check=True, cwd='fetch_commit')
 
 def run_process_commits(args=None):
     # Run process_commits in the nanotron environment
     subprocess.run([
         '.venv/bin/python', 'main.py'
-    ], check=True, cwd='validator/process_commit')
+    ], check=True, cwd='process_commit')
 
 def main():
     parser = argparse.ArgumentParser(description="Run fetch_commits with specified arguments.")
@@ -28,15 +28,15 @@ def main():
     # Parse the arguments
     args = parser.parse_args()
 
-    fetch_process = Process(target=run_fetch_commits, args=(args,))
+    # fetch_process = Process(target=run_fetch_commits, args=(args,))
     process_process = Process(target=run_process_commits, args=(args,))
 
-    fetch_process.start()
+    # fetch_process.start()
     process_process.start()
 
-    fetch_process.join()
+    # fetch_process.join()
     process_process.join()
 
 if __name__ == "__main__":
-    
+
     main()
