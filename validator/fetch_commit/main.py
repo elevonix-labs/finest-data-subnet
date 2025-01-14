@@ -1,34 +1,26 @@
 import os
 import sys
 import time
+import logging
 from typing import Any, cast
 import bittensor as bt
 from bittensor.core.extrinsics.serving import get_metadata
-import argparse
 import redis
 import json
 from collections import defaultdict
-
 import utils
 
 previous_commits = defaultdict(dict)
 
-def get_config():
-    """
-    Initialize and parse command-line arguments and add Bittensor-specific arguments.
-    Returns:
-        config (bt.Config): Parsed configuration.
-    """
-    parser = argparse.ArgumentParser(description="Commit dataset to Bittensor subtensor chain.")
-    parser.add_argument("--netuid", type=str, default="250", help="The unique identifier for the network")
-    # Add Bittensor-specific arguments
-    bt.wallet.add_args(parser)
-    bt.subtensor.add_args(parser)
-    bt.logging.add_args(parser)
-
-    config = bt.config(parser)
-    return config
-
+# Set up logging
+logging.basicConfig(
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.INFO,
+    handlers=[
+        logging.StreamHandler(),  # Outputs to the console
+        logging.FileHandler('commit_fetching.log', mode='w')  # Overwrites the log file each time
+    ]
+)
 
 def fetch_commits(config: bt.config, redis_queue: redis.Redis):
     """
@@ -45,8 +37,10 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
         # Ensure the wallet is registered
         _ , uid = utils.assert_registered(wallet, metagraph)
 
+        logging.info("Started fetching commits...")
+
         while True:
-            print("Fetching commits...")
+            logging.info("Fetching commits...")
             for uid in metagraph.uids:
                 try:
                     # Fetch the current commit
@@ -63,21 +57,22 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
                             "commit_block": commit_block
                         }
                         redis_queue.rpush("commit_queue", json.dumps(data))
-                        print(f"pushing to redis {data}")
+                        logging.info(f"Pushed commit data to Redis: {data}")
                         previous_commits[uid] = current_commit
 
                 except Exception as e:
-                    print(f"Error fetching commit for uid {uid}: {e}")
+                    logging.error(f"Error fetching commit for UID {uid}: {e}", exc_info=True)
 
             # Sleep for the interval defined in config
-            time.sleep(1 * 10)
+            logging.info("Sleeping for the defined interval...")
+            time.sleep(1 * 3600)
 
     except Exception as e:
-        print(f"Error in fetch_commits: {e}")
+        logging.error(f"Error in fetch_commits: {e}", exc_info=True)
 
 if __name__ == "__main__":
 
     redis_queue = redis.Redis(host='localhost', port=6379, db=0)
 
-    config = get_config()
+    config = utils.get_config()
     fetch_commits(config, redis_queue)
