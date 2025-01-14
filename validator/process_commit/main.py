@@ -9,6 +9,7 @@ from check_similarity import DataProcessor
 from config import generate_training_config
 from train import start_training_and_kill
 from evaluate import run_lighteval
+from calculate import calculate_score
 
 def process_commits(redis_queue: redis.Redis):
     """
@@ -26,7 +27,6 @@ def process_commits(redis_queue: redis.Redis):
                 current_commit = commit_data['current_commit']
                 commit_block = commit_data['commit_block']
                 hf_url = extract_commit(current_commit)
-                print(hf_url)
                 response = requests.post(f"{os.getenv('API_URL')}/subnets/check-task/", json={"uid": int(uid)})
                 data = response.json()
                 warc_files = data.get('warc_files')
@@ -47,6 +47,12 @@ def process_commits(redis_queue: redis.Redis):
                                 mean_value = 0.0
                                 mean_stderr = 0.0
                             print(mean_value, mean_stderr, elapsed_time)
+                            score = calculate_score(elapsed_time, mean_value, mean_stderr, sample_similarities)
+                            raw_score = redis_queue.hget("scores", uid)
+                            current_score = json.loads(raw_score) if raw_score else 0
+                            updated_score = current_score * 0.8 + score * 0.2
+                            redis_queue.hset("scores", uid, json.dumps(updated_score))
+                            
             else:
                 print("No commit found")
         except Exception as e:
