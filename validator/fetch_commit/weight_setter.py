@@ -6,6 +6,16 @@ import time
 from utils import process_weights_for_netuid, convert_weights_and_uids_for_emit
 import logging
 
+# Set up logging
+logging.basicConfig(
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.INFO,
+    handlers=[
+        logging.StreamHandler(),  # Outputs to the console
+        logging.FileHandler('weight_setting.log', mode='w')  # Overwrites the log file each time
+    ]
+)
+
 def set_weights(scores: list, config: bt.config, metagraph: bt.metagraph, subtensor: bt.subtensor):
     """Sets weights on the blockchain based on provided scores."""
     
@@ -22,7 +32,7 @@ def set_weights(scores: list, config: bt.config, metagraph: bt.metagraph, subten
 
     # Compute raw_weights safely
     raw_weights = scores / norm
-
+    logging.info(f"Raw weights: {raw_weights}")
     wallet = bt.wallet(config=config)
 
     try:
@@ -52,10 +62,12 @@ def set_weights(scores: list, config: bt.config, metagraph: bt.metagraph, subten
             logging.error(f"set_weights failed: {msg}")
 
     except Exception as e:
-        logging.error(f"An error occurred during weight setting: {e}")
+        logging.error(f"An error occurred during weight setting: {e}", exc_info=True)
 
 def main(config: bt.config, subtensor: bt.subtensor):
     """Main loop to periodically set weights."""
+
+    logging.info("Started main loop to periodically set weights.")
 
     while True:
         try:
@@ -63,13 +75,19 @@ def main(config: bt.config, subtensor: bt.subtensor):
                 metagraph: bt.metagraph = subtensor.metagraph(config.netuid)
                 redis_queue = redis.Redis(host='localhost', port=6379, db=0)
                 raw_scores = redis_queue.hgetall('scores')
-                scores =  [float(raw_scores.get(bytes(str(uid), 'utf-8'), b'0')) for uid in metagraph.uids]
+                scores = [float(raw_scores.get(bytes(str(uid), 'utf-8'), b'0')) for uid in metagraph.uids]
+
+                logging.info(f"Setting weights for {len(scores)} UIDs...")
                 set_weights(scores, config, metagraph, subtensor)
+                logging.info("Waiting for next cycle...")
                 time.sleep(10)
+
         except Exception as e:
-            logging.error(f"An error occurred in the main loop: {e}")
+            logging.error(f"An error occurred in the main loop: {e}", exc_info=True)
 
 if __name__ == "__main__":
+
+    logging.info("Initializing the process...")
 
     config = utils.get_config()
     subtensor = bt.subtensor(config=config)

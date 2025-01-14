@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import logging
 from typing import Any, cast
 import bittensor as bt
 from bittensor.core.extrinsics.serving import get_metadata
@@ -11,7 +12,15 @@ import utils
 
 previous_commits = defaultdict(dict)
 
-
+# Set up logging
+logging.basicConfig(
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.INFO,
+    handlers=[
+        logging.StreamHandler(),  # Outputs to the console
+        logging.FileHandler('commit_fetching.log', mode='w')  # Overwrites the log file each time
+    ]
+)
 
 def fetch_commits(config: bt.config, redis_queue: redis.Redis):
     """
@@ -28,8 +37,10 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
         # Ensure the wallet is registered
         _ , uid = utils.assert_registered(wallet, metagraph)
 
+        logging.info("Started fetching commits...")
+
         while True:
-            print("Fetching commits...")
+            logging.info("Fetching commits...")
             for uid in metagraph.uids:
                 try:
                     # Fetch the current commit
@@ -46,17 +57,18 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
                             "commit_block": commit_block
                         }
                         redis_queue.rpush("commit_queue", json.dumps(data))
-                        print(f"pushing to redis {data}")
+                        logging.info(f"Pushed commit data to Redis: {data}")
                         previous_commits[uid] = current_commit
 
                 except Exception as e:
-                    print(f"Error fetching commit for uid {uid}: {e}")
+                    logging.error(f"Error fetching commit for UID {uid}: {e}", exc_info=True)
 
             # Sleep for the interval defined in config
-            time.sleep(1 * 10)
+            logging.info("Sleeping for the defined interval...")
+            time.sleep(1 * 3600)
 
     except Exception as e:
-        print(f"Error in fetch_commits: {e}")
+        logging.error(f"Error in fetch_commits: {e}", exc_info=True)
 
 if __name__ == "__main__":
 
