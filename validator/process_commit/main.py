@@ -3,10 +3,12 @@ import redis
 import json
 import requests
 import os
+import numpy as np
 from utils import extract_commit
 from check_similarity import DataProcessor
 from config import generate_training_config
-from training import start_training_and_kill
+from train import start_training_and_kill
+from evaluate import run_lighteval
 
 def process_commits(redis_queue: redis.Redis):
     """
@@ -31,9 +33,20 @@ def process_commits(redis_queue: redis.Redis):
                 request_block = data.get('request_block')
                 data_processor = DataProcessor(warc_files, hf_url)
                 sample_similarities = data_processor.run()
+                elapsed_time = (commit_block - request_block) * 12
                 if generate_training_config(hf_url):
                         training_success = start_training_and_kill('config.yaml', 1)
                         print(training_success)
+                        if training_success:
+                            matches = run_lighteval(1)
+                            values, stderrs = zip(*[(float(match[1]), float(match[2])) for match in matches if match[0] == 'truthfulqa_mc2'])
+                            if values and stderrs:
+                                mean_value = np.mean(values)
+                                mean_stderr = np.mean(stderrs)
+                            else:
+                                mean_value = 0.0
+                                mean_stderr = 0.0
+                            print(mean_value, mean_stderr, elapsed_time)
             else:
                 print("No commit found")
         except Exception as e:

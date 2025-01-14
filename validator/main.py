@@ -28,15 +28,15 @@ def main():
     # Parse the arguments
     args = parser.parse_args()
 
-    fetch_process = Process(target=run_fetch_commits, args=(args,))
+    # fetch_process = Process(target=run_fetch_commits, args=(args,))
     process_process = Process(target=run_process_commits, args=(args,))
 
-    fetch_process.start()
+    # fetch_process.start()
     process_process.start()
 
-    fetch_process.join()
+    # fetch_process.join()
     process_process.join()
 
 if __name__ == "__main__":
-    
+
     main()

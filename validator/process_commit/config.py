@@ -93,7 +93,7 @@ def generate_training_config(hf_url: str):
         )
 
         # Define token arguments
-        tokens = TokensArgs(sequence_length=2048, train_steps=1, micro_batch_size=2, batch_accumulation_per_replica=4)
+        tokens = TokensArgs(sequence_length=2048, train_steps=10, micro_batch_size=2, batch_accumulation_per_replica=4)
 
         # Set up checkpoint path
         checkpoints_path = os.path.join(os.path.dirname(__file__), "checkpoints")
@@ -127,7 +127,7 @@ def generate_training_config(hf_url: str):
             ),
             DatasetStageArgs(
                 name="Annealing Phase",
-                start_training_step=2,
+                start_training_step=10,
                 data=DataArgs(
                     dataset=PretrainDatasetsArgs(
                         hf_dataset_or_datasets=hf_url,

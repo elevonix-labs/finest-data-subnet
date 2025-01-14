@@ -29,7 +29,7 @@ data_stages:
     num_loading_workers: 1
     seed: 42
   name: Annealing Phase
-  start_training_step: 2
+  start_training_step: 10
 general:
   benchmark_csv_path: null
   consumed_train_samples: null
@@ -75,7 +75,7 @@ optimizer:
   learning_rate_scheduler:
     learning_rate: 0.0003
     lr_decay_starting_step: null
-    lr_decay_steps: -499
+    lr_decay_steps: -490
     lr_decay_style: cosine
     lr_warmup_steps: 500
     lr_warmup_style: linear
@@ -109,5 +109,5 @@ tokens:
   limit_val_batches: 0
   micro_batch_size: 2
   sequence_length: 2048
-  train_steps: 1
+  train_steps: 10
   val_check_interval: -1

@@ -6,6 +6,7 @@ cd ..
 
 cd process_commit
 poetry install
+poetry run pip install flash-attn==2.7.3
 cd ..
 
 echo "Environments set up successfully."
