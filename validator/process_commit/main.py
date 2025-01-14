@@ -35,24 +35,23 @@ def process_commits(redis_queue: redis.Redis):
                 sample_similarities = data_processor.run()
                 elapsed_time = (commit_block - request_block) * 12
                 if generate_training_config(hf_url):
-                        training_success = start_training_and_kill('config.yaml', 1)
-                        print(training_success)
-                        if training_success:
-                            matches = run_lighteval(1)
-                            values, stderrs = zip(*[(float(match[1]), float(match[2])) for match in matches if match[0] == 'truthfulqa_mc2'])
-                            if values and stderrs:
-                                mean_value = np.mean(values)
-                                mean_stderr = np.mean(stderrs)
-                            else:
-                                mean_value = 0.0
-                                mean_stderr = 0.0
-                            print(mean_value, mean_stderr, elapsed_time)
-                            score = calculate_score(elapsed_time, mean_value, mean_stderr, sample_similarities)
-                            raw_score = redis_queue.hget("scores", uid)
-                            current_score = json.loads(raw_score) if raw_score else 0
-                            updated_score = current_score * 0.8 + score * 0.2
-                            redis_queue.hset("scores", uid, json.dumps(updated_score))
-                            
+                    training_success = start_training_and_kill('config.yaml', 1)
+                    print(training_success)
+                    if training_success:
+                        matches = run_lighteval(1)
+                        values, stderrs = zip(*[(float(match[1]), float(match[2])) for match in matches if match[0] == 'truthfulqa_mc2'])
+                        if values and stderrs:
+                            mean_value = np.mean(values)
+                            mean_stderr = np.mean(stderrs)
+                        else:
+                            mean_value = 0.0
+                            mean_stderr = 0.0
+                        print(mean_value, mean_stderr, elapsed_time)
+                        score = calculate_score(elapsed_time, mean_value, mean_stderr, sample_similarities)
+                        raw_score = redis_queue.hget("scores", uid)
+                        current_score = json.loads(raw_score) if raw_score else 0
+                        updated_score = current_score * 0.8 + score * 0.2
+                        redis_queue.hset("scores", uid, json.dumps(updated_score))
             else:
                 print("No commit found")
         except Exception as e:

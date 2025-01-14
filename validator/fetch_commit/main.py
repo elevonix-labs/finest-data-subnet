@@ -4,30 +4,13 @@ import time
 from typing import Any, cast
 import bittensor as bt
 from bittensor.core.extrinsics.serving import get_metadata
-import argparse
 import redis
 import json
 from collections import defaultdict
-
 import utils
 
 previous_commits = defaultdict(dict)
 
-def get_config():
-    """
-    Initialize and parse command-line arguments and add Bittensor-specific arguments.
-    Returns:
-        config (bt.Config): Parsed configuration.
-    """
-    parser = argparse.ArgumentParser(description="Commit dataset to Bittensor subtensor chain.")
-    parser.add_argument("--netuid", type=str, default="250", help="The unique identifier for the network")
-    # Add Bittensor-specific arguments
-    bt.wallet.add_args(parser)
-    bt.subtensor.add_args(parser)
-    bt.logging.add_args(parser)
-
-    config = bt.config(parser)
-    return config
 
 
 def fetch_commits(config: bt.config, redis_queue: redis.Redis):
@@ -79,5 +62,5 @@ if __name__ == "__main__":
 
     redis_queue = redis.Redis(host='localhost', port=6379, db=0)
 
-    config = get_config()
+    config = utils.get_config()
     fetch_commits(config, redis_queue)

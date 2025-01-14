@@ -15,8 +15,18 @@ def run_fetch_commits(args=None):
 def run_process_commits(args=None):
     # Run process_commits in the nanotron environment
     subprocess.run([
-        '.venv/bin/python', 'main.py'
+        '.venv/bin/python', 'main.py',
     ], check=True, cwd='process_commit')
+
+def run_weight_setter(args=None):
+    # Run weight_setter in the bittensor environment
+    subprocess.run([
+        '.venv/bin/python', 'weight_setter.py',
+        '--netuid', args.netuid,
+        '--wallet.name', args.wallet_name,
+        '--wallet.hotkey', args.wallet_hotkey,
+        '--subtensor.network', args.subtensor_network
+    ], check=True, cwd='fetch_commit')
 
 def main():
     parser = argparse.ArgumentParser(description="Run fetch_commits with specified arguments.")
@@ -28,15 +38,18 @@ def main():
     # Parse the arguments
     args = parser.parse_args()
 
-    # fetch_process = Process(target=run_fetch_commits, args=(args,))
+    fetch_process = Process(target=run_fetch_commits, args=(args,))
     process_process = Process(target=run_process_commits, args=(args,))
+    weight_setter_process = Process(target=run_weight_setter, args=(args,))
 
-    # fetch_process.start()
+
+    fetch_process.start()
     process_process.start()
+    weight_setter_process.start()
 
-    # fetch_process.join()
+    fetch_process.join()
     process_process.join()
-
+    weight_setter_process.join()
 if __name__ == "__main__":
 
     main()
