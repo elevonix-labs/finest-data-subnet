@@ -61,6 +61,20 @@ Now, you should be able to run:
 poetry --version
 ```
 
+### AWS Credentials
+
+You will need to have AWS credentials in the following file:
+
+```bash
+~/.aws/credentials
+```
+
+```bash
+[default]
+aws_access_key_id = YOUR_ACCESS_KEY_ID
+aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
+```
+
 ### Installing Dependencies
 
 Ensure you have the required dependencies installed. You can use the following command to install them:
