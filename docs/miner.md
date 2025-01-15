@@ -82,11 +82,11 @@ If you are not familiar with Slurm, please refer to [datatrove.md](datatrove.md)
 You can run the pipeline using the provided script. Here's an example command to execute the script:
 
 ```bash
-poetry run python miner/main.py --hf_repo your_hf_repo --wallet.name your_wallet_name --wallet.hotkey your_wallet_hotkey [--total_tasks total_task] [--cpus_per_task your_cpus_number] [--limit limit_per_task]
+poetry run python miner/main.py --hf_repo your_hf_repo --wallet.name your_wallet_name --wallet.hotkey your_wallet_hotkey [--total_tasks total_task] [--cpus_per_task your_cpus_number]
 ```
 
 Example:
 
 ```bash
-poetry run python miner/main.py --hf_repo barney49/original_data --wallet.name miner1 --wallet.hotkey miner1 --total_tasks 4 --cpus_per_task 32 --limit 100
+poetry run python miner/main.py --hf_repo barney49/original_data --wallet.name test-miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32 --subtensor.network test
 ```
