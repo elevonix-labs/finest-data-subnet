@@ -88,7 +88,7 @@ def main(config: bt.config, subtensor: bt.subtensor):
 if __name__ == "__main__":
 
     logging.info("Initializing the process...")
-
+    
     config = utils.get_config()
     subtensor = bt.subtensor(config=config)
     main(config, subtensor)

@@ -122,7 +122,7 @@ class DataProcessor:
         scores = []
         for i in range(min(self.num_samples, len(found_texts))):
             score = self.calculate_word_match_similarity(found_texts[i], selected_texts[i])
-            scores.append(f'{score:.2f}%')
+            scores.append(round(score, 2))
             print(f'Match Score for ID {sorted_random_samples[i]["id"]}: {score:.2f}%')
 
         elapsed_time = time.time() - start_time

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+poetry install
+
 cd fetch_commit
 poetry install
 cd ..
