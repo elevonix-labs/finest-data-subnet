@@ -1,6 +1,7 @@
 import subprocess
 import argparse
 from multiprocessing import Process
+from dotenv import load_dotenv
 
 def run_fetch_commits(args=None):
     # Run fetch_commits in the bittensor environment
@@ -11,6 +12,16 @@ def run_fetch_commits(args=None):
                '--subtensor.network', args.subtensor_network
                ]
     subprocess.run(command, check=True, cwd='fetch_commit')
+
+def run_report_score(args=None):
+    # Run report_score in the bittensor environment
+    subprocess.run([
+        '.venv/bin/python', 'report_score.py',
+        '--netuid', args.netuid,
+        '--wallet.name', args.wallet_name,
+        '--wallet.hotkey', args.wallet_hotkey,
+        '--subtensor.network', args.subtensor_network
+    ], check=True, cwd='fetch_commit')
 
 def run_process_commits(args=None):
     # Run process_commits in the nanotron environment
@@ -41,15 +52,20 @@ def main():
     fetch_process = Process(target=run_fetch_commits, args=(args,))
     process_process = Process(target=run_process_commits, args=(args,))
     weight_setter_process = Process(target=run_weight_setter, args=(args,))
-
+    report_score_process = Process(target=run_report_score, args=(args,))
 
     fetch_process.start()
     process_process.start()
     weight_setter_process.start()
+    report_score_process.start()
 
     fetch_process.join()
     process_process.join()
     weight_setter_process.join()
+    report_score_process.join()
+
 if __name__ == "__main__":
+
+    load_dotenv()
 
     main()

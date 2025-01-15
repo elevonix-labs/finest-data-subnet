@@ -27,6 +27,8 @@ def process_commits(redis_queue: redis.Redis):
     Async task to process commits from the queue with logging.
     """
     redis_queue.delete("commit_queue")
+    redis_queue.delete("report_score")
+    redis_queue.delete("scores")
 
     while True:
         try:
@@ -42,17 +44,20 @@ def process_commits(redis_queue: redis.Redis):
                 hf_url = extract_commit(current_commit)
                 logging.info(f"Extracted commit URL: {hf_url}")
 
-                while True:
+                max_retries = 5 
+                retry_count = 0 
+                while retry_count < max_retries:
                     try:
                         response = requests.post(f"{os.getenv('API_URL')}/subnets/check-task/", json={"uid": int(uid)})
                         data = response.json()
+                        task_id = data.get('task_id')
                         warc_files = data.get('warc_files')
                         request_block = data.get('request_block')
                         break
                     except Exception as e:
                         logging.error(f"Error occurred: {e}", exc_info=True)
                         time.sleep(10)
-
+                        retry_count += 1
                 logging.info(f"Received API response, warc_files: {warc_files}, request_block: {request_block}")
 
                 # Data processing
@@ -89,19 +94,23 @@ def process_commits(redis_queue: redis.Redis):
 
                         # Score calculation
                         score = calculate_score(elapsed_time, mean_value, mean_stderr, sample_similarities)
+                        report_data = {
+                            "task_id": task_id,
+                            "score": score
+                        }
+                        redis_queue.rpush("report_score", json.dumps(report_data))
                         raw_score = redis_queue.hget("scores", uid)
                         current_score = json.loads(raw_score) if raw_score else 0
                         updated_score = current_score * 0.8 + score * 0.2
                         redis_queue.hset("scores", uid, json.dumps(updated_score))
                         logging.info(f"Updated score for UID {uid}: {updated_score}")
                 logging.info(f"Total time taken: {time.time() - start_time}")
-            else:
-                logging.info("No commit found in the queue")
         except Exception as e:
             logging.error(f"Error occurred: {e}", exc_info=True)
         time.sleep(5)
 
 if __name__ == "__main__":
+    
     redis_queue = redis.Redis(host='localhost', port=6379, db=0)
     logging.info("Starting process commits")
     process_commits(redis_queue)

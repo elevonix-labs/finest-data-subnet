@@ -1,6 +1,5 @@
 import os
 import re
-import csv
 import pty
 import subprocess
 import select
@@ -29,11 +28,8 @@ def run_lighteval(world_size: int = 1) -> list:
         list: Extracted metrics, values, and stderr from the log output.
     """
     env = setup_environment(world_size)
-    command = [
-        "poetry", "run", "lighteval", "nanotron",
-        "--checkpoint-config-path", "checkpoints/10/config.yaml",
-        "--lighteval-override", "template.yaml",
-    ]
+    
+    command = "bash -c 'source .venv/bin/activate && lighteval nanotron --checkpoint-config-path checkpoints/10/config.yaml --lighteval-override template.yaml'"
 
     log_output = run_process(command, env)
     
@@ -73,7 +69,9 @@ def run_process(command: list, env: dict) -> str:
         str: The captured log output.
     """
     master_fd, slave_fd = pty.openpty()
-    process = subprocess.Popen(command, env=env, stdout=slave_fd, stderr=slave_fd, close_fds=True, text=True)
+    process_commit_path = os.path.dirname(os.path.abspath(__file__)) 
+
+    process = subprocess.Popen(command, env=env, shell=True, cwd=process_commit_path, stdout=slave_fd, stderr=slave_fd, close_fds=True, text=True)
 
     log_output = ""
     try:
@@ -135,7 +133,7 @@ def parse_log_output(log_output: str) -> list:
     Returns:
         list: Extracted metrics, values, and stderr.
     """
-    pattern = r"\|\s*(truthfulqa_mc\d)\s*\|(\d\.\d{3,4})\|\±\s*\|(\d\.\d{3,4})"
+    pattern = r"\|\s*(truthfulqa_mc2)\s*\|(\d\.\d{3,4})\|\s*±\s*\|(\d\.\d{3,4})\|"
     try:
         matches = re.findall(pattern, log_output)
         return matches
@@ -144,5 +142,7 @@ def parse_log_output(log_output: str) -> list:
         return []
 
 if __name__ == "__main__":
+
     results = run_lighteval()
+
     print(f"Results: {results}")
