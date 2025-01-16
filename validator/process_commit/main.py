@@ -55,12 +55,13 @@ def process_commits(redis_queue: redis.Redis):
                         request_block = data.get('request_block')
                         break
                     except Exception as e:
-                        logging.error(f"Error occurred: {e}", exc_info=True)
+                        logging.error(f"Can't get warc files now, trying again in 10 seconds {e}", exc_info=True)
                         time.sleep(10)
                         retry_count += 1
                 logging.info(f"Received API response, warc_files: {warc_files}, request_block: {request_block}")
 
                 # Data processing
+                logging.info("Starting check similarity process")
                 data_processor = DataProcessor(warc_files, hf_url)
                 sample_similarities = data_processor.run()
                 logging.info(f"Data processing completed with {len(sample_similarities)} similarities found.")

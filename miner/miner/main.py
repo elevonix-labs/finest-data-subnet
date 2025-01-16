@@ -36,6 +36,7 @@ logging.basicConfig(
     ],
 )
 
+
 try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
@@ -100,23 +101,22 @@ async def main(config):
         logging.info(f"Received {len(warc_files)} warc files")
 
         if not warc_files:  
-            bt.logging.info("WARC files not found, waiting for 2 hours before retrying...")
+            logging.warning("WARC files not found, waiting for 2 hours before retrying...")
             await asyncio.sleep(2 * 3600)  
             continue  
 
         result_path = f"./result"
         # # Remove result path if it already exists
         if os.path.exists(result_path):
-            logging.info(f"Removing result folder {result_path}")
+            logging.warning(f"Removing result folder {result_path}")
             remove_result_folder(result_path)
         
-        logging.info(f"Refining {len(warc_files)} warc files")
+        logging.info(f"Refining {len(warc_files)} warc files 📚")
         refiner = DataRefiner(warc_files, result_path, config.total_tasks, config.cpus_per_task, config.limit)
         processing_success = refiner.refine()
 
         if processing_success:
-            logging.info("Data processing completed successfully")
-            bt.logging.success("🎉 Data processing completed successfully")
+            logging.info("Data processing completed successfully 🎉")
 
             hf_repo_hash = upload_dataset(result_path, config.hf_repo)
             
@@ -125,12 +125,12 @@ async def main(config):
                     try:
                         logging.info(f"Committing dataset to subtensor chain {hf_repo_hash}:{config.hf_repo}")
                         subtensor.commit(wallet, config.netuid, f"{hf_repo_hash}:{config.hf_repo}")
-                        bt.logging.success("🎉 Successfully committed dataset to subtensor chain")
+                        logging.info("🎉 Successfully committed dataset to subtensor chain 🎉")
                         break
                     except Exception as e:
                         import traceback
                         traceback.print_exc()
-                        bt.logging.error(f"Error while committing to subtensor chain: {e}, retrying in 300 seconds...")
+                        logging.warning(f"Can't commit to subtensor chain now, retrying in 300 seconds..{e}")
                         await asyncio.sleep(300)
                 
                 max_retries = 10
@@ -138,18 +138,18 @@ async def main(config):
 
                 while retry_count < max_retries:
                     try:
-                        logging.info(f"Sending finish request for hotkey {hotkey}")
+                        logging.info(f"Sending finish request for hotkey {hotkey} 📤")
                         message =f"{timestamp}{timezone}"
                         signature = generate_signature(wallet, message)
                         response = send_finish_request(hotkey, message, signature, config.hf_repo)
                         if response:
                             break
                     except Exception as e:
-                        logging.error(f"Error while sending finish request: {e}")
+                        logging.warning(f"Can't send finish request now, trying again in 20 seconds {e}")
                         await asyncio.sleep(20)
                         retry_count += 1
         end = time.time() - start
-        print(f"Processing time: {end:.2f} seconds")
+        logging.info(f"Processing time: {end:.2f} seconds 🕒")
 
         await asyncio.sleep(8 * 3600) 
 
@@ -159,6 +159,6 @@ if __name__ == "__main__":
 
     config = get_config()
 
-    logging.info("Starting the mining")
+    logging.info("Starting the mining 🚀")
 
     asyncio.run(main(config))
