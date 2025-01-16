@@ -139,6 +139,8 @@ async def main(config):
                 while retry_count < max_retries:
                     try:
                         logging.info(f"Sending finish request for hotkey {hotkey}")
+                        message =f"{timestamp}{timezone}"
+                        signature = generate_signature(wallet, message)
                         response = send_finish_request(hotkey, message, signature, config.hf_repo)
                         if response:
                             break
