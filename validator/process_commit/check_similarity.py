@@ -109,7 +109,6 @@ class DataProcessor:
         return match_percentage   
 
     def run(self):
-        start_time = time.time()
         random_samples = self.get_random_samples()
         ids_to_random = {sample['id'] for sample in random_samples}
         all_random_texts = self.process_all_warc_files(ids_to_random)
@@ -125,6 +124,4 @@ class DataProcessor:
             scores.append(round(score, 2))
             print(f'Match Score for ID {sorted_random_samples[i]["id"]}: {score:.2f}%')
 
-        elapsed_time = time.time() - start_time
-        print(f'Total time: {elapsed_time:.2f} seconds')
         return scores

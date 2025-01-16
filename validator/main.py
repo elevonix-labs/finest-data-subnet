@@ -27,6 +27,7 @@ def run_process_commits(args=None):
     # Run process_commits in the nanotron environment
     subprocess.run([
         '.venv/bin/python', 'main.py',
+        '--world_size', args.world_size,
     ], check=True, cwd='process_commit')
 
 def run_weight_setter(args=None):
@@ -45,6 +46,7 @@ def main():
     parser.add_argument('--wallet_name', type=str,  help="The wallet name")
     parser.add_argument('--wallet_hotkey', type=str,  help="The wallet hotkey")
     parser.add_argument('--subtensor_network', type=str, help="The subtensor network")
+    parser.add_argument('--world_size', type=str, default=1, help="The number of GPUs to use")
 
     # Parse the arguments
     args = parser.parse_args()
