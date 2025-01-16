@@ -64,8 +64,8 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
                     logging.error(f"Error fetching commit for UID {uid}: {e}", exc_info=True)
 
             # Sleep for the interval defined in config
-            logging.info("Sleeping for the defined interval...")
-            time.sleep(1 * 3600)
+            logging.info("sleeping 5 mins for next fetching commits")
+            time.sleep(300)
 
     except Exception as e:
         logging.error(f"Error in fetch_commits: {e}", exc_info=True)
