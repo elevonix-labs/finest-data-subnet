@@ -37,7 +37,7 @@ def report_score(config: bt.config, redis_queue: redis.Redis):
                 metagraph: bt.metagraph = subtensor.metagraph(config.netuid)
                 hotkey, _ = utils.assert_registered(wallet, metagraph)
                 signature = utils.generate_signature(wallet, f"{task_id}")
-
+                print(f"Report score for task_id: {score}")
                 max_retries = 10
                 retry_count = 0
 
@@ -54,16 +54,17 @@ def report_score(config: bt.config, redis_queue: redis.Redis):
                             logging.info(f"Report submitted successfully for task_id: {task_id}")
                             break
                         else:
-                            logging.error(f"Error submitting report: {response.status_code}", exc_info=True)
+                            logging.error(f"Can't report score now, try again in 10 seconds: {response.status_code}", exc_info=True)
                             time.sleep(10)
                     except Exception as e:
-                        logging.error(f"Error submitting report: {e}", exc_info=True)
+                        logging.error(f"Can't report score now, try again in 10 seconds: {e}", exc_info=True)
                         time.sleep(10)
                     retry_count += 1 
                 else:
-                    logging.error("Max retries reached. Failed to submit report.")    
+                    logging.error("Max retries reached. Failed to submit report. Going to next task")    
         except Exception as e:
-            logging.error(f"Error in fetch_commits: {e}", exc_info=True)
+            logging.error(f"Can't report score now, try again in 10 seconds: {e}", exc_info=True)
+            time.sleep(10)
 
 if __name__ == "__main__":
 
