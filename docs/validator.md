@@ -67,16 +67,39 @@ poetry --version
 
 ### AWS Credentials
 
-You will need to have AWS credentials in the following file:
+You will need to have AWS config and credentials in the following file:
+
+~/.aws/config
 
 ```bash
-~/.aws/credentials
+[default]
+region = us-west-1
+output = json
 ```
+
+
+~/.aws/credentials
 
 ```bash
 [default]
 aws_access_key_id = YOUR_ACCESS_KEY_ID
 aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
+```
+Or you can add it in .env file
+Plz check .env.sample file for more details.
+
+### Adding .env file
+
+```bash
+cp .env.sample .env
+```
+
+### Adding API_URL
+
+You need to add API_URL in .env file.
+
+```bash
+API_URL=https://finest-data-api.elevonix.io/api
 ```
 
 ### Installing Dependencies
@@ -97,6 +120,12 @@ sudo apt update
 sudo apt install redis-server
 
 sudo service redis-server start
+
+```
+Check if redis is running
+
+```bash
+redis-cli ping
 ```
 
 ## Getting Commit
@@ -116,5 +145,8 @@ poetry run python main.py --netuid netuid --wallet_name your_wallet_name --walle
 Example
 
 ```bash
-poetry run python main.py --netuid 250 --wallet_name test-validator --wallet_hotkey h1 --subtensor_network test
+poetry run python main.py --netuid 250 --wallet_name test-validator --wallet_hotkey h1 --subtensor_network test --world_size 1
 ```
+**Explanation of the arguments:**
+- **--netuid**, **--wallet_name**, **--wallet_hotkey**, **--subtensor_network**: These arguments are used to specify the wallet name, hotkey, subtensor network of bittensor network. Plz check (bittensor docs)[https://docs.bittensor.com/] for more details.
+- **--world_size**: This argument sets the world_size. In the context of the script, it is used to determine the number of GPUs to use, as seen in the get_world_size function. We set 1 as default.
