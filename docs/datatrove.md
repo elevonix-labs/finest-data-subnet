@@ -14,7 +14,7 @@ Make sure you have AWS configured with the necessary credentials. Update or crea
 
 ```
 [default]
-region = us-west-2
+region = us-west-1
 output = json
 ```
 
@@ -29,12 +29,14 @@ aws_secret_access_key = YOUR_SECRET_KEY
 Check aws config using `aws s3 ls`, after install `awscli`.
 Install it with `apt install awscli` 
 
-Also create s3 bucket for saving dataset, you can follow this [docs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html).
-
-
 ### Install SLURMDBD and configuration
 
 - Install Required Dependencies
+
+If you didn't install sudo, you can use this command to install it
+```bash
+sudo apt install sudo
+```
 
 ```bash
 sudo apt update
@@ -45,10 +47,12 @@ sudo apt install mariadb-server
 - Configure mariadb
 
 ```bash
-sudo systemctl start mariadb
-sudo systemctl enable mariadb
-sudo mysql_secure_installation
+sudo service mariadb start
 ```
+
+
+If you need to set up the root password and other security settings, please follow this [docs](https://mariadb.com/kb/en/mysql_secure_installation/).
+
 
 - Create SLURM database and User
 
@@ -85,14 +89,13 @@ StorageLoc=slurm_acct_db
 
 ```bash
 sudo chmod 600 /etc/slurm/slurmdbd.conf
-sudo systemctl enable slurmdbd
-sudo systemctl start slurmdbd
+sudo service slurmdbd start
 ```
 
 - Verify the slurmdbd installation
 
 ```bash
-sudo systemctl status slurmdbd
+sudo service slurmdbd status
 ```
 
 ### Install SLURM and configuration
@@ -112,30 +115,51 @@ sudo apt install build-essential munge libmunge-dev libmunge2 libssl-dev
 sudo dd if=/dev/urandom bs=1 count=1024 of=/etc/munge/munge.key
 sudo chown munge:munge /etc/munge/munge.key
 sudo chmod 400 /etc/munge/munge.key
-sudo systemctl enable munge
-sudo systemctl start munge
+sudo service munge start
 ```
 
 - Set hostname
 
+if you can use hostnamectl, you will be able to use this command to set hostname
+
 ```bash
 sudo hostnamectl set-hostname head
 ```
+or if you can't use hostnamectl, you can add it manually in /etc/hosts
 
 ```bash
 sudo nano /etc/hosts
 ```
-
 Add line for host `127.0.0.1 head`
 
+If you haven't already updated the /etc/hostname file with the hostname head, you can do so:
+
+```bash
+sudo nano /etc/hostname
+```
+Make sure that the file contains just the hostname:
+
+```bash
+head
+```
+
+```bash
+sudo reboot
+```
+
 - Configure slurm
+
+**Note: You need to check your server specifications using the `lscpu` and `free -m` command.**
+
+For `RealMemory` input the total value of `free -m` command.
+From `lscpu`, You can get the values `CPU(s):`, `Core(s) per socket:`, `Thread(s) per core`, `Socket(s):`
+
 
 ```bash
 sudo nano /etc/slurm/slurm.conf
 ```
 
-**Note: You need to check your server specifications using the `lscpu` and `free -m` command.**
-
+Use below configuration as a reference. Update the values `CPU(s):`, `Core(s) per socket:`, `Thread(s) per core`, `Socket(s):` with your server specifications.
 ```ini
 # slurm.conf
 ClusterName=my_cluster
@@ -156,14 +180,14 @@ NodeName=head CPUs=32 Sockets=1 CoresPerSocket=16 ThreadsPerCore=2 RealMemory=10
 PartitionName=hopper-cpu Nodes=head Default=YES MaxTime=INFINITE State=UP OverSubscribe=Force
 ```
 
-For `RealMemory` input the total value of `free -m` command.
-From `lscpu`, You can get the values `CPU(s):`, `Core(s) per socket:`, `Thread(s) per core`, `Socket(s):`
+
 
 ```bash
+sudo chmod 600 /etc/slurm/slurm.conf
 sudo systemctl enable slurmd
-sudo systemctl start slurmd
+sudo service slurmd start
 sudo systemctl enable slurmctld
-sudo systemctl start slurmctld
+sudo service slurmctld start
 ```
 
 ```bash
