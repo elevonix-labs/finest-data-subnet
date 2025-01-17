@@ -82,6 +82,7 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
                 logging.info(f"Received API response, warc_files: {warc_files}, request_block: {request_block}")
 
                 # Data processing
+                logging.info("Starting check similarity process")
                 data_processor = DataProcessor(warc_files, hf_url)
                 logging.info("Starting check similarity process")
 

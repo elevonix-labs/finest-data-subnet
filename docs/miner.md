@@ -63,16 +63,48 @@ poetry --version
 
 ### AWS Credentials
 
-You will need to have AWS credentials in the following file:
+You will need to have AWS config and credentials in the following file:
+
+~/.aws/config
 
 ```bash
-~/.aws/credentials
+[default]
+region = us-east-1
+output = json
 ```
+
+~/.aws/credentials
 
 ```bash
 [default]
 aws_access_key_id = YOUR_ACCESS_KEY_ID
 aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
+```
+
+### Huggingface Token
+
+You will need to have a Huggingface token to push the dataset to Huggingface. You can get it from [here](https://huggingface.co/settings/tokens).
+You can add it in .env file. Plz check .env.sample file for more details.
+```bash
+HF_TOKEN=YOUR_HUGGINGFACE_TOKEN
+```
+Or you can set it using huggingface-cli.
+```bash
+huggingface-cli login
+```
+
+### Adding .env file
+
+```bash
+cp .env.sample .env
+```
+
+### Adding API_URL
+
+You need to add API_URL in .env file.
+
+```bash
+API_URL=https://finest-data-api.elevonix.io/api
 ```
 
 ### Installing Dependencies
@@ -104,3 +136,9 @@ Example:
 ```bash
 poetry run python miner/main.py --hf_repo barney49/original_data --wallet.name test-miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32 --subtensor.network test
 ```
+
+**Explanation of the arguments:**
+- **--netuid**, **--wallet_name**, **--wallet_hotkey**, **--subtensor_network**: These arguments are used to specify the wallet name, hotkey, subtensor network of bittensor network. Plz check (bittensor docs)[https://docs.bittensor.com/] for more details.
+- **--total_tasks**: This argument sets the total number of tasks to be processed. It can reflect distribute tasks across resources.
+- **--cpus_per_task**: This argument sets the number of CPUs per task. This is likely used to allocate CPU resources for each task
+
