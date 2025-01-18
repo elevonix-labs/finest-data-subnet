@@ -26,7 +26,26 @@ import shutil
 import logging
 from utils import assert_registered
 from generate import generate_signature
+from colorama import Fore, init
+# Initialize colorama
+init(autoreset=True)
 
+# Custom logging formatter to add colors and emojis
+class ColoredFormatter(logging.Formatter):
+    COLORS = {
+        'INFO': Fore.GREEN,
+        'WARNING': Fore.YELLOW,
+        'ERROR': Fore.RED,
+    }
+
+    def format(self, record):
+        log_level = record.levelname
+        color = self.COLORS.get(log_level, Fore.WHITE)
+        
+        message = super().format(record)
+        return f"{color} {message}"
+
+# Configure logging with color logging for console output
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO,
@@ -36,6 +55,13 @@ logging.basicConfig(
     ],
 )
 
+# Get the root logger
+logger = logging.getLogger()
+
+# Set custom colored formatter for the console handler
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(ColoredFormatter('%(asctime)s - %(levelname)s - %(message)s'))
+logger.handlers[0] = console_handler 
 
 try:
     nltk.data.find('tokenizers/punkt')
@@ -67,7 +93,7 @@ def get_config() -> bt.config:
     return config
 def remove_result_folder(folder_path):
     shutil.rmtree(folder_path)
-    print(f"Folder '{folder_path}' removed successfully.")
+    logging.info(f"Folder '{folder_path}' removed successfully.")
 
 async def main(config):
     """
@@ -123,7 +149,7 @@ async def main(config):
             if hf_repo_hash:
                 while True:
                     try:
-                        logging.info(f"Committing dataset to subtensor chain {hf_repo_hash}:{config.hf_repo}")
+                        print(f"Committing dataset to subtensor chain {hf_repo_hash}:{config.hf_repo}")
                         subtensor.commit(wallet, config.netuid, f"{hf_repo_hash}:{config.hf_repo}")
                         logging.info("🎉 Successfully committed dataset to subtensor chain 🎉")
                         break

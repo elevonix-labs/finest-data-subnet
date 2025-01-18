@@ -36,7 +36,7 @@ class DataProcessor:
         self.bucket_name = bucket_name
         self.warc_files = warc_files
         self.hf_url = hf_url
-        self.s3 = boto3.client('s3')
+        self.s3 = boto3.client('s3', region_name='us-west-1')
 
     def get_random_samples(self):
         dataset = load_dataset(self.hf_url, split='train')
