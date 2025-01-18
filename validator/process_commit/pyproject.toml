@@ -22,6 +22,7 @@ torch = ">=1.13.1"
 numpy="<2"
 setuptools = "^75.8.0"
 lighteval = {git = "https://github.com/huggingface/lighteval", rev = "cf87de993bf5f90120f8d630cc7bbcedd02bcd4c"}
+colorama = "^0.4.6"
 
 
 [build-system]
