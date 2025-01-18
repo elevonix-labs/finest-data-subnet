@@ -46,11 +46,10 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
                     # Fetch the current commit
                     current_commit = subtensor.get_commitment(netuid=config.netuid, uid=uid)
                     # Check if commit has changed
-                    if current_commit and current_commit != previous_commits.get(uid):
+                    if current_commit and current_commit != (previous_commits.get(uid)[0] if previous_commits.get(uid) else None):
                         hotkey = metagraph.hotkeys[uid]
                         metadata = cast(dict[str, Any], get_metadata(subtensor, metagraph.netuid, hotkey))
                         commit_block = metadata["block"]
-
                         data = {
                             "uid": int(uid),
                             "current_commit": current_commit,
@@ -58,8 +57,18 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
                         }
                         redis_queue.rpush("commit_queue", json.dumps(data))
                         logging.info(f"Pushed commit data to Redis: {data}")
-                        previous_commits[uid] = current_commit
-
+                        previous_commits[uid] = (current_commit, commit_block)
+                    # If commit is not changed in one day, giving punishment
+                    elif current_commit and (subtensor.get_current_block() - (previous_commits.get(uid)[1] if previous_commits.get(uid) else None)) > 7200:
+                        logging.info(f"Commit for UID {uid} is skipped one day, Updating score")
+                        previous_commits[uid] = (current_commit, subtensor.get_current_block())
+                        raw_score = redis_queue.hget("scores", int(uid))
+                        current_score = json.loads(raw_score) if raw_score else 0
+                        updated_score = current_score * 0.8
+                        redis_queue.hset("scores", int(uid), json.dumps(updated_score))
+                    else:
+                        logging.info(f"No commit for UID {uid} or commit is not changed in one day, skipping")
+                        continue
                 except Exception as e:
                     logging.error(f"Error fetching commit for UID {uid}: {e}", exc_info=True)
 

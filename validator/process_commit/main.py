@@ -122,10 +122,10 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
                             "task_id": task_id,
                             "score": score
                         }
-                        logging.info(f"Got score for UID {uid}: {score}")
+                        logging.info(f"Calculated score for UID {uid}: {score}")
                         updated_score = current_score * 0.8 + score * 0.2
                         redis_queue.rpush("report_score", json.dumps(report_data))
-                        redis_queue.hset("scores", uid, json.dumps(updated_score))
+                        redis_queue.hset("scores", int(uid), json.dumps(updated_score))
                 logging.info(f"Total time taken: {time.time() - start_time}")
             else:
                 print(f"No commit data found in commit queue...")
