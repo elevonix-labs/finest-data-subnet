@@ -12,9 +12,12 @@ This script is designed to commit datasets to the Bittensor subtensor chain. It 
 - **RAM**: 128 GB or higher
 - **Storage**: 500 GB free disk space for dataset storage and processing
 - **GPU**:
-  - **Model**: NVIDIA RTX 3080/3090 or NVIDIA A40
-  - **Memory**: Minimum 8 GB of VRAM
-  - **Count**: 4 + (Recommended)
+  - **Minimum Model**: NVIDIA RTX 3070 or equivalent
+  - **Minimum Memory**: 8 GB of VRAM
+  - **Minimum Count**: 2 (to handle multiple tasks efficiently)
+  - **Recommended Model**: NVIDIA RTX 3080/3090 or NVIDIA A40
+  - **Recommended Memory**: Minimum 8 GB of VRAM
+  - **Recommended Count**: 4+ (for optimal performance with larger datasets)
 
 ### 2. **Software Requirements**
 

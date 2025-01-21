@@ -149,7 +149,7 @@ async def main(config):
             if hf_repo_hash:
                 while True:
                     try:
-                        print(f"Committing dataset to subtensor chain {hf_repo_hash}:{config.hf_repo}")
+                        logging.info(f"Committing dataset to subtensor chain {hf_repo_hash}:{config.hf_repo}")
                         subtensor.commit(wallet, config.netuid, f"{hf_repo_hash}:{config.hf_repo}")
                         logging.info("🎉 Successfully committed dataset to subtensor chain 🎉")
                         break
