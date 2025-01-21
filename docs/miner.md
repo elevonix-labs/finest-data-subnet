@@ -49,7 +49,10 @@ If you need to set up the root password and other security settings, please foll
 
 ```bash
 sudo mysql -u root -p
+```
+After that in mysql client, run below commands
 
+```bash
 CREATE DATABASE slurm_acct_db;
 CREATE USER 'slurm'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON slurm_acct_db.* TO 'slurm'@'localhost';
@@ -64,6 +67,8 @@ sudo apt install slurmdbd slurm-wlm
 ```bash
 sudo nano /etc/slurm/slurmdbd.conf
 ```
+
+Use below configuration for slurmdbd as a reference.
 
 ```ini
 # slurmdbd.conf
@@ -90,6 +95,9 @@ sudo systemctl start slurmdbd
 sudo service slurmdbd status
 ```
 
+Refer to this image for more details.
+![Slurmdbd Status](./docs/slurmdbd_status.png)
+
 #### Install SLURM and configuration
 
 - Install SLURM on your system to manage and execute the pipeline.
@@ -113,12 +121,12 @@ sudo systemctl start munge
 
 - Set hostname
 
-if you can use hostnamectl, you will be able to use this command to set hostname
+1. if you can use hostnamectl, you will be able to use this command to set hostname
 
 ```bash
 sudo hostnamectl set-hostname head
 ```
-or if you can't use hostnamectl, you can add it manually in /etc/hosts
+2. Or if you can't use hostnamectl, you can add it manually in /etc/hosts
 
 ```bash
 sudo nano /etc/hosts
@@ -130,6 +138,9 @@ If you haven't already updated the /etc/hostname file with the hostname head, yo
 ```bash
 sudo nano /etc/hostname
 ```
+
+
+
 Make sure that the file contains just the hostname:
 
 ```bash
@@ -145,14 +156,14 @@ hostname
 **Note: You need to check your server specifications using the `lscpu` and `free -m` command.**
 
 For `RealMemory` input the total value of `free -m` command.
-From `lscpu`, You can get the values `CPU(s):`, `Core(s) per socket:`, `Thread(s) per core`, `Socket(s):`
+From `lscpu`, You can get the values `CPU(s):`, `Core(s) per socket:`, `Thread(s) per core`, `Socket(s):`,
 
 
 ```bash
 sudo nano /etc/slurm/slurm.conf
 ```
 
-Use below configuration as a reference. Update the values `CPU(s):`, `Core(s) per socket:`, `Thread(s) per core`, `Socket(s):` with your server specifications.
+Use below configuration as a reference. Update the values `CPU(s):`, `Core(s) per socket:`, `Thread(s) per core`, `Socket(s):`, `RealMemory` with your server specifications.
 ```ini
 # slurm.conf
 ClusterName=my_cluster
@@ -173,6 +184,25 @@ NodeName=head CPUs=32 Sockets=1 CoresPerSocket=16 ThreadsPerCore=2 RealMemory=10
 PartitionName=hopper-cpu Nodes=head Default=YES MaxTime=INFINITE State=UP OverSubscribe=Force
 ```
 
+### Explanation of Parameters:
+
+- **CPUs**: The total number of logical CPUs (or threads) available on the node. More CPUs allow for more parallel processing, which can speed up data processing tasks. This is particularly beneficial for tasks that can be parallelized, such as data preprocessing, model training, or simulations. Faster processing can lead to quicker iterations and potentially higher data quality as more complex models or larger datasets can be handled efficiently.
+
+- **Sockets**: The number of physical CPU sockets. While this doesn't directly affect performance, it indicates the physical layout of the CPUs. A single socket with multiple cores can be efficient for tasks that require high inter-core communication.
+
+- **CoresPerSocket**: The number of physical cores per socket. More cores mean more tasks can be executed simultaneously, improving throughput and reducing the time required for data processing. This can enhance data quality by allowing more comprehensive data checks or more complex models to be run within a given time frame.
+
+- **ThreadsPerCore**: This indicates hyper-threading, where each core can handle two threads. Hyper-threading can improve performance for multi-threaded applications by better utilizing CPU resources, leading to faster data processing and potentially better data quality through more thorough analysis.
+
+
+- **RealMemory**: The amount of RAM available on the node, measured in megabytes. Sufficient memory is crucial for handling large datasets and complex computations. Insufficient memory can lead to swapping (using disk space as virtual memory), which significantly slows down processing and can degrade data quality if processes are terminated prematurely due to memory constraints.
+
+
+### Usage
+
+This configuration is crucial for SLURM to effectively manage and allocate resources across the cluster. It ensures that jobs are scheduled on nodes with the appropriate hardware capabilities, optimizing performance and resource utilization.
+
+For more detailed information on configuring SLURM nodes, refer to the [SLURM documentation](https://slurm.schedmd.com/slurm.conf.html).
 
 
 ```bash
