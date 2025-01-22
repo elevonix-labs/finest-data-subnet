@@ -41,30 +41,38 @@ def run_weight_setter(args=None):
     ], check=True, cwd='fetch_commit')
 
 def main():
-    parser = argparse.ArgumentParser(description="Run fetch_commits with specified arguments.")
-    parser.add_argument('--netuid', type=str,  help="The unique identifier for the network")
-    parser.add_argument('--wallet_name', type=str,  help="The wallet name")
-    parser.add_argument('--wallet_hotkey', type=str,  help="The wallet hotkey")
-    parser.add_argument('--subtensor_network', type=str, help="The subtensor network")
-    parser.add_argument('--world_size', type=str, default=1, help="The number of GPUs to use")
+    try:
+        parser = argparse.ArgumentParser(description="Run fetch_commits with specified arguments.")
+        parser.add_argument('--netuid', type=str,  help="The unique identifier for the network")
+        parser.add_argument('--wallet_name', type=str,  help="The wallet name")
+        parser.add_argument('--wallet_hotkey', type=str,  help="The wallet hotkey")
+        parser.add_argument('--subtensor_network', type=str, help="The subtensor network")
+        parser.add_argument('--world_size', type=str, default=1, help="The number of GPUs to use")
 
-    # Parse the arguments
-    args = parser.parse_args()
+        # Parse the arguments
+        args = parser.parse_args()
 
-    fetch_process = Process(target=run_fetch_commits, args=(args,))
-    process_process = Process(target=run_process_commits, args=(args,))
-    weight_setter_process = Process(target=run_weight_setter, args=(args,))
-    report_score_process = Process(target=run_report_score, args=(args,))
+        fetch_process = Process(target=run_fetch_commits, args=(args,))
+        process_process = Process(target=run_process_commits, args=(args,))
+        weight_setter_process = Process(target=run_weight_setter, args=(args,))
+        report_score_process = Process(target=run_report_score, args=(args,))
 
-    fetch_process.start()
-    process_process.start()
-    weight_setter_process.start()
-    report_score_process.start()
+        fetch_process.start()
+        process_process.start()
+        weight_setter_process.start()
+        report_score_process.start()
 
-    fetch_process.join()
-    process_process.join()
-    weight_setter_process.join()
-    report_score_process.join()
+        fetch_process.join()
+        process_process.join()
+        weight_setter_process.join()
+        report_score_process.join()
+    except KeyboardInterrupt:
+        print("Process interrupted by user.")
+        # Optionally, terminate the processes if needed
+        fetch_process.terminate()
+        process_process.terminate()
+        weight_setter_process.terminate()
+        report_score_process.terminate()
 
 if __name__ == "__main__":
 
