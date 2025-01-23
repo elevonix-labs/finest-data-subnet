@@ -65,7 +65,9 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
         metagraph: bt.metagraph = subtensor.metagraph(config.netuid)
         
         # Ensure the wallet is registered
-        _ , uid = utils.assert_registered(wallet, metagraph)
+        hotkey , uid = utils.assert_registered(wallet, metagraph)
+
+        logging.info(f"Validator: {hotkey} is registered with uid: {uid}")
 
         logging.info("Started fetching commits...")
 
