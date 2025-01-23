@@ -150,6 +150,12 @@ Example
 ```bash
 poetry run python main.py --netuid 250 --wallet_name test-validator --wallet_hotkey h1 --subtensor_network test --world_size 1
 ```
+
+Or run with pm2
+```bash
+pm2 start main.py --name validator --interpreter .venv/bin/python -- --netuid 250 --wallet_name test-validator --wallet_hotkey h1 --subtensor_network test --world_size 1
+```
+
 **Explanation of the arguments:**
 - **--netuid**, **--wallet_name**, **--wallet_hotkey**, **--subtensor_network**: These arguments are used to specify the wallet name, hotkey, subtensor network of bittensor network. Plz check (bittensor docs)[https://docs.bittensor.com/] for more details.
 - **--world_size**: This argument sets the world_size. In the context of the script, it is used to determine the number of GPUs to use, as seen in the get_world_size function. We set 1 as default.

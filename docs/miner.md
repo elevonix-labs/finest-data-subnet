@@ -362,6 +362,12 @@ Example:
 poetry run python miner/main.py --netuid 250 --hf_repo barneylogo/original_data --wallet.name test-miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32 --subtensor.network test
 ```
 
+
+Or run with pm2
+```bash
+pm2 start miner/main.py --name miner --interpreter .venv/bin/python -- --netuid 250 --hf_repo barneylogo/original_data --wallet.name test-miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32 --subtensor.network test
+```
+
 **Explanation of the arguments:**
 - **--netuid**, **--wallet_name**, **--wallet_hotkey**, **--subtensor_network**: These arguments are used to specify the wallet name, hotkey, subtensor network of bittensor network. Plz check (bittensor docs)[https://docs.bittensor.com/] for more details.
 - **--total_tasks**: This argument sets the total number of tasks to be processed. It can reflect distribute tasks across resources.
