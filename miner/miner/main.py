@@ -167,7 +167,7 @@ async def main(config):
                             logging.info(f"Sending finish request for hotkey {hotkey} 📤")
                             message =f"{timestamp}{timezone}"
                             signature = generate_signature(wallet, message)
-                            response = send_finish_request(hotkey, message, signature, config.hf_repo)
+                            response = send_finish_request(hotkey, message, signature, f"{hf_repo_hash}:{config.hf_repo}")
                             if response:
                                 break
                         except Exception as e:
