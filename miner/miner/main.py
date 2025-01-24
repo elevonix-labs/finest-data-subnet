@@ -105,7 +105,6 @@ async def main(config):
     try:
         print(f"bittensor version: {bt.__version__}")
 
-
         while True:  # Infinite loop to keep the script running continuously
             start = time.time()
             # Initialize logging

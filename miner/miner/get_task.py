@@ -15,10 +15,8 @@ def fetch_warc_files(hotkey, message, signature):
         warc_files = response.json().get('warc_paths')  # Assuming the API returns a JSON array of file paths
         return warc_files
     except requests.HTTPError as http_err:
-        if response.status_code in [400, 404]:
-            # Extract the 'detail' from the error response
-            error_detail = response.json().get('detail', 'Unknown error')
-            print(f"Error fetching WARC files: {error_detail}")
+        if response.status_code  == 404:
+            print(f"{response.json().get('message', 'Unknown error')}")
         else:
             print(f"HTTP error occurred: {http_err}")
         return []
@@ -27,12 +25,20 @@ def fetch_warc_files(hotkey, message, signature):
         return []
 
 def send_finish_request(hotkey, message, signature, hf_repo):
-    api_url = os.getenv("API_URL")
-    response = requests.post(f"{api_url}/subnets/finish-task/", json={"hotkey": hotkey, "message": message, "signature": signature, "hf_repo": hf_repo})
-    response.raise_for_status()
-    if response.status_code == 200:
-        print(f"Finished task for hotkey: {hotkey}")
-        return True
-    else:
-        print(f"Failed to finish task for hotkey: {hotkey}")
+    """Sends a finish request to the API."""
+    try:
+        api_url = os.getenv("API_URL")
+        response = requests.post(f"{api_url}/subnets/finish-task/", json={"hotkey": hotkey, "message": message, "signature": signature, "hf_repo": hf_repo})
+        response.raise_for_status()
+        if response.status_code == 200:
+            print(f"Finished task for hotkey: {hotkey}")
+            return True
+        else:
+            print(f"Failed to finish task for hotkey: {hotkey}")
+            return False
+    except requests.HTTPError as http_err:
+        if response.status_code  == 404:
+            print(f"{response.json().get('message', 'Unknown error')}")
+        else:
+            print(f"Error sending finish request: {str(http_err)}")
         return False
