@@ -50,15 +50,21 @@ def report_score(config: bt.config, redis_queue: redis.Redis):
                                                      "score": score,
                                                      "signature": signature
                                                  })
+                        response.raise_for_status()
+
                         if response.status_code == 200:
                             logging.info(f"Report submitted successfully for task_id: {task_id}")
                             break
                         else:
                             logging.error(f"Can't report score now, try again in 10 seconds: {response.status_code}", exc_info=True)
                             time.sleep(10)
-                    except Exception as e:
-                        logging.error(f"Can't report score now, try again in 10 seconds: {e}", exc_info=True)
-                        time.sleep(10)
+                    except requests.HTTPError as http_err:
+                        if http_err.response.status_code == 404:
+                            logging.error(f"{response.json().get('message', 'Unknown error')}", exc_info=True)
+                            time.sleep(10)
+                        else:
+                            logging.error(f"Can't report score now, try again in 10 seconds: {http_err}", exc_info=True)
+                            time.sleep(10)
                     retry_count += 1 
                 else:
                     logging.error("Max retries reached. Failed to submit report. Going to next task")    
