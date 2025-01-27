@@ -1,6 +1,6 @@
 def extract_commit(input:str)-> str:
     # Split the string only at the first occurrence of ':'
 
-    url = input.split(':')[-1]
+    hf_url, hash = input.split(':')
 
-    return url
+    return hf_url, hash

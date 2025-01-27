@@ -3,6 +3,7 @@ import os
 import gzip
 import json
 import shutil
+from datetime import datetime
 from datasets import Dataset, DatasetDict
 
 def read_datasets(dataset_path):
@@ -48,21 +49,22 @@ def upload_dataset(result_path, hf_repo):
 
     print("Uploading dataset to Hugging Face...")
 
-    api = HfApi()
-    
-    if upload_to_hf(dataset_dict, hf_repo, hf_token):
+    current_timestamp = datetime.now()
 
-        repo_info = api.dataset_info(hf_repo)
+    formatted_timestamp = current_timestamp.strftime("%Y_%m_%d_%H")
+
+    repo_name= f"{hf_repo}_{formatted_timestamp}"
+
+    if upload_to_hf(dataset_dict, repo_name, hf_token):
 
         remove_result_folder(result_path)
 
-        return repo_info.sha
+        return repo_name
     else:
         return False
 
 if __name__ == "__main__":
     # Replace these with actual parameters or environment variables
     result_path = "./result"
-    hf_repo = "barney49/original_data"
+    hf_repo = "barneylogo/prefix"
     result = upload_dataset(result_path, hf_repo)
-    print(result)

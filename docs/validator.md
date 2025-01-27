@@ -9,12 +9,12 @@ This script is designed to commit datasets to the Bittensor subtensor chain. It 
 #### Recommended Hardware
 
 - **CPU**: AMD Ryzen 7 or Ryzen 9
-- **RAM**: 128 GB or higher
-- **Storage**: 500 GB free disk space for dataset storage and processing
+- **RAM**: 64 GB or higher
+- **Storage**: 250 GB free disk space for dataset storage and processing
 - **GPU**:
   - **Minimum Model**: NVIDIA RTX 3070 or equivalent
   - **Minimum Memory**: 8 GB of VRAM
-  - **Minimum Count**: 2 (to handle multiple tasks efficiently)
+  - **Minimum Count**: 1
   - **Recommended Model**: NVIDIA RTX 3080/3090 or NVIDIA A40
   - **Recommended Memory**: Minimum 8 GB of VRAM
   - **Recommended Count**: 4+ (for optimal performance with larger datasets)
@@ -66,6 +66,12 @@ Now, you should be able to run:
 
 ```bash
 poetry --version
+```
+
+### Getting code
+
+```bash
+git clone https://github.com/elevonix-labs/finest-data-subnet.git
 ```
 
 ### AWS Credentials

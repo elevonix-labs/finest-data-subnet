@@ -75,8 +75,8 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
                 commit_block = commit_data['commit_block']
                 logging.info(f"Processing commit {current_commit} for UID {uid}")
 
-                hf_url = extract_commit(current_commit)
-                logging.info(f"Extracted commit URL: {hf_url} 🔗")
+                hf_url, hash = extract_commit(current_commit)
+                logging.info(f"Extracted commit URL: {hf_url} : {hash} 🔗")
 
                 max_retries = 5 
                 retry_count = 0
@@ -110,7 +110,7 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
 
                 # Data processing
                 logging.info("Starting check similarity process")
-                data_processor = DataProcessor(warc_files, hf_url)
+                data_processor = DataProcessor(warc_files, hf_url, hash)
 
                 sample_similarities = data_processor.run()
 
@@ -118,7 +118,6 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
 
                 elapsed_time = (commit_block - request_block) * 12
                 # Training phase
-                training_start_time = time.time()
                 if generate_training_config(hf_url):
                     training_success = start_training_and_kill('config.yaml', world_size)
                     logging.info(f"Training success: {training_success}")

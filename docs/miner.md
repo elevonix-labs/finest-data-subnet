@@ -290,6 +290,13 @@ Now, you should be able to run:
 poetry --version
 ```
 
+### Getting code
+
+```bash
+git clone https://github.com/elevonix-labs/finest-data-subnet.git
+```
+
+
 ### AWS Credentials
 
 You will need to have AWS config and credentials in the following file:
