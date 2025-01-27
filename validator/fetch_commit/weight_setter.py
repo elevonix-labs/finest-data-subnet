@@ -8,17 +8,22 @@ import logging
 
 # Set up logging
 logging.basicConfig(
-    format='%(asctime)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(levelname)s - %(message)s",
     level=logging.INFO,
     handlers=[
         logging.StreamHandler(),  # Outputs to the console
-        logging.FileHandler('weight_setting.log', mode='w')  # Overwrites the log file each time
-    ]
+        logging.FileHandler(
+            "weight_setting.log", mode="w"
+        ),  # Overwrites the log file each time
+    ],
 )
 
-def set_weights(scores: list, config: bt.config, metagraph: bt.metagraph, subtensor: bt.subtensor):
+
+def set_weights(
+    scores: list, config: bt.config, metagraph: bt.metagraph, subtensor: bt.subtensor
+):
     """Sets weights on the blockchain based on provided scores."""
-    
+
     if np.isnan(scores).any():
         logging.warning("Scores contain NaN values. Exiting weight setting.")
         return
@@ -64,6 +69,7 @@ def set_weights(scores: list, config: bt.config, metagraph: bt.metagraph, subten
     except Exception as e:
         logging.error(f"An error occurred during weight setting: {e}", exc_info=True)
 
+
 def main(config: bt.config, subtensor: bt.subtensor):
     """Main loop to periodically set weights."""
 
@@ -73,9 +79,12 @@ def main(config: bt.config, subtensor: bt.subtensor):
         try:
             if subtensor.get_current_block() % 100 == 0:
                 metagraph: bt.metagraph = subtensor.metagraph(config.netuid)
-                redis_queue = redis.Redis(host='localhost', port=6379, db=0)
-                raw_scores = redis_queue.hgetall('scores')
-                scores = [float(raw_scores.get(bytes(str(uid), 'utf-8'), b'0')) for uid in metagraph.uids]
+                redis_queue = redis.Redis(host="localhost", port=6379, db=0)
+                raw_scores = redis_queue.hgetall("scores")
+                scores = [
+                    float(raw_scores.get(bytes(str(uid), "utf-8"), b"0"))
+                    for uid in metagraph.uids
+                ]
 
                 logging.info(f"Setting weights for {len(scores)} UIDs...")
                 set_weights(scores, config, metagraph, subtensor)
@@ -85,10 +94,11 @@ def main(config: bt.config, subtensor: bt.subtensor):
         except Exception as e:
             logging.error(f"An error occurred in the main loop: {e}", exc_info=True)
 
+
 if __name__ == "__main__":
 
     logging.info("Initializing the process...")
-    
+
     config = utils.get_config()
     subtensor = bt.subtensor(config=config)
     main(config, subtensor)

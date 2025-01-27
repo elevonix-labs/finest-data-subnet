@@ -7,12 +7,18 @@ export CUDA_DEVICE_MAX_CONNECTIONS=1 # important for some distributed operations
 torchrun --nproc_per_node=8 run_train.py --config-file examples/config_tiny_llama.yaml
 ```
 """
+
 import argparse
 from typing import Dict, cast
 import os
 import numpy as np
 from nanotron import logging
-from nanotron.config import DataArgs, DatasetStageArgs, NanosetDatasetsArgs, PretrainDatasetsArgs
+from nanotron.config import (
+    DataArgs,
+    DatasetStageArgs,
+    NanosetDatasetsArgs,
+    PretrainDatasetsArgs,
+)
 from nanotron.data.dataloader_builder import build_nanoset_dataloader
 from nanotron.dataloader import (
     clm_process,
@@ -55,15 +61,21 @@ def get_dataloader_from_data_stage(
     consumed_train_samples: The number of samples consumed by the model in the this stage (each stage starts from zero).
     num_remaining_train_steps: The number of remaining training steps for this stage.
     """
-    assert consumed_train_samples >= 0, "consumed_train_samples should be greater than 0"
-    assert num_remaining_train_steps >= 0, "num_remaining_train_steps should be greater than 0"
+    assert (
+        consumed_train_samples >= 0
+    ), "consumed_train_samples should be greater than 0"
+    assert (
+        num_remaining_train_steps >= 0
+    ), "num_remaining_train_steps should be greater than 0"
 
     # First, we need to know which ranks to feed the dataloader to
     input_pp_rank, output_pp_rank = get_input_output_pp_ranks(model=trainer.model)
 
     # Case 1: Dummy data generator
     if data.dataset is None:
-        log_rank("Using dummy data generator", logger=logger, level=logging.INFO, rank=0)
+        log_rank(
+            "Using dummy data generator", logger=logger, level=logging.INFO, rank=0
+        )
         dataloader = dummy_infinite_data_generator(
             micro_batch_size=trainer.micro_batch_size,
             sequence_length=trainer.sequence_length,
@@ -133,7 +145,9 @@ def get_dataloader_from_data_stage(
             # Check if we have enough samples for train_steps
             total_tokens_dataset = len(dataloader.dataset) * trainer.sequence_length
             num_tokens_needed_for_training = (
-                num_remaining_train_steps * trainer.global_batch_size * trainer.sequence_length
+                num_remaining_train_steps
+                * trainer.global_batch_size
+                * trainer.sequence_length
             )
             assert num_tokens_needed_for_training <= total_tokens_dataset, (
                 f"Dataset is too small for steps ({total_tokens_dataset} < {num_tokens_needed_for_training}), "
@@ -143,7 +157,9 @@ def get_dataloader_from_data_stage(
     # Case 3: Nanosets
     elif isinstance(data.dataset, NanosetDatasetsArgs):
         # Get tokenizer cardinality
-        tokenizer = AutoTokenizer.from_pretrained(trainer.config.tokenizer.tokenizer_name_or_path)
+        tokenizer = AutoTokenizer.from_pretrained(
+            trainer.config.tokenizer.tokenizer_name_or_path
+        )
         token_size = 4 if len(tokenizer) > np.iinfo(np.uint16).max + 1 else 2
         del tokenizer
         # Create Nanoset
@@ -155,7 +171,8 @@ def get_dataloader_from_data_stage(
                 dataset_weights=data.dataset.dataset_weights,
                 sequence_length=trainer.sequence_length,
                 token_size=token_size,
-                train_split_num_samples=trainer.config.tokens.train_steps * trainer.global_batch_size,
+                train_split_num_samples=trainer.config.tokens.train_steps
+                * trainer.global_batch_size,
                 random_seed=data.seed,
             )
 
@@ -174,7 +191,9 @@ def get_dataloader_from_data_stage(
 
         return train_dataloader
     else:
-        raise ValueError(f"Unhandled case of `self.config.data.dataset`. Got: {data.dataset}")
+        raise ValueError(
+            f"Unhandled case of `self.config.data.dataset`. Got: {data.dataset}"
+        )
 
     return dataloader
 
@@ -186,7 +205,9 @@ def get_dataloader(trainer: DistributedTrainer) -> Dict[str, DataLoader]:
         # NOTE: we only create the dataloader for the first stage,
         # then we lazy initialize the dataloader for the other stages
         stage = cast(DatasetStageArgs, stage)
-        consumed_train_samples = get_consumed_train_samples_of_a_data_stage_from_ckp(stage, trainer.metadata)
+        consumed_train_samples = get_consumed_train_samples_of_a_data_stage_from_ckp(
+            stage, trainer.metadata
+        )
         assert (
             consumed_train_samples is not None
         ), f"Cannot find consumed_train_samples for stage {stage.start_training_step} in the checkpoint"
@@ -219,18 +240,19 @@ def get_dataloader(trainer: DistributedTrainer) -> Dict[str, DataLoader]:
         dataloaders[stage.name] = dataloader
     return dataloaders
 
-def train_process(config_file: str, world_size : int):
+
+def train_process(config_file: str, world_size: int):
     """
     Function to load the trainer, get the dataloader, and start training.
 
     :param config_file: Path to the YAML or Python config file.
     """
     os.environ["CUDA_DEVICE_MAX_CONNECTIONS"] = "1"
-    os.environ['MASTER_ADDR'] = os.environ.get('MASTER_ADDR', 'localhost')
-    os.environ['MASTER_PORT'] = '29500'
-    os.environ['WORLD_SIZE'] = str(os.environ.get('WORLD_SIZE', world_size))
-    os.environ['RANK'] = str(os.environ.get('RANK', 0))
-    os.environ['LOCAL_RANK'] = str(os.environ.get('LOCAL_RANK', os.environ['RANK']))
+    os.environ["MASTER_ADDR"] = os.environ.get("MASTER_ADDR", "localhost")
+    os.environ["MASTER_PORT"] = "29500"
+    os.environ["WORLD_SIZE"] = str(os.environ.get("WORLD_SIZE", world_size))
+    os.environ["RANK"] = str(os.environ.get("RANK", 0))
+    os.environ["LOCAL_RANK"] = str(os.environ.get("LOCAL_RANK", os.environ["RANK"]))
     # Load trainer and data
     trainer = DistributedTrainer(config_file)
     dataloader = get_dataloader(trainer)
@@ -244,7 +266,9 @@ def start_training_and_kill(config_file: str, world_size: int):
     Function to start the training process and terminate it after completion.
     """
     # Start the training in a separate process
-    process = multiprocessing.Process(target=train_process, args=(config_file, world_size))
+    process = multiprocessing.Process(
+        target=train_process, args=(config_file, world_size)
+    )
     process.start()
 
     # Wait for the training to complete
@@ -263,13 +287,19 @@ def start_training_and_kill(config_file: str, world_size: int):
         print(f"Training process {process.pid} failed or was terminated.")
         return False
 
+
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config-file", type=str, required=True, help="Path to the YAML or python config file")
+    parser.add_argument(
+        "--config-file",
+        type=str,
+        required=True,
+        help="Path to the YAML or python config file",
+    )
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = get_args()
     args.world_size
-    start_training_and_kill(args.config_file, world_size= args.world_size | 1)
+    start_training_and_kill(args.config_file, world_size=args.world_size | 1)

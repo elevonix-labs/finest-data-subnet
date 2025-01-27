@@ -1,6 +1,6 @@
 # Miners
 
-We use [DataTrove](https://github.com/huggingface/datatrove), a lightweight yet powerful data refinement library, as the backbone of our **FineWeb τ** subnet. The miner is responsible for training the data refinement model and submitting it to Huggingface 🤗. You can refer to the training document from the DataTrove repo for the training guideline. We will also provide a detailed training setup here.
+We use [DataTrove](https://github.com/huggingface/datatrove), a lightweight yet powerful data refinement library, as the backbone of our **Finesτ Daτa** subnet. The miner is responsible for training the data refinement model and submitting it to Huggingface 🤗. You can refer to the training document from the DataTrove repo for the training guideline. We will also provide a detailed training setup here.
 
 ## Prerequisites
 
@@ -366,13 +366,13 @@ poetry run python miner/main.py --netuid 250 --hf_repo your_hf_repo --wallet.nam
 Example:
 
 ```bash
-poetry run python miner/main.py --netuid 250 --hf_repo barneylogo/original_data --wallet.name test-miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32 --subtensor.network test
+poetry run python miner/main.py --netuid 250 --hf_repo tobiashomie/finest_dataset --wallet.name test-miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32 --subtensor.network test
 ```
 
 
 Or run with pm2
 ```bash
-pm2 start miner/main.py --name miner --interpreter .venv/bin/python -- --netuid 250 --hf_repo barneylogo/original_data --wallet.name test-miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32 --subtensor.network test
+pm2 start miner/main.py --name miner --interpreter .venv/bin/python -- --netuid 250 --hf_repo tobiashomie/finest_dataset --wallet.name test-miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32 --subtensor.network test
 ```
 
 **Explanation of the arguments:**

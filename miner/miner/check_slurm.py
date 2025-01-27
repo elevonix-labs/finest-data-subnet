@@ -1,5 +1,6 @@
 import subprocess
-import time 
+import time
+
 
 def check_slurm_job_status(job_id):
     """
@@ -14,22 +15,27 @@ def check_slurm_job_status(job_id):
     try:
         # Run the `sacct` command to get the job status
         result = subprocess.run(
-            ['sacct', '-j', str(job_id), '--format=State', '--noheader'],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+            ["sacct", "-j", str(job_id), "--format=State", "--noheader"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
         )
 
         # Check if the command was successful
         if result.returncode != 0:
             print(f"Error checking job status: {result.stderr.strip()}")
-            return 'UNKNOWN'
+            return "UNKNOWN"
 
         # Get the status from the command output
-        job_status = result.stdout.strip().split()[0] if result.stdout.strip() else 'UNKNOWN'
+        job_status = (
+            result.stdout.strip().split()[0] if result.stdout.strip() else "UNKNOWN"
+        )
         return job_status
 
     except Exception as e:
         print(f"Error checking job status: {e}")
-        return 'UNKNOWN'
+        return "UNKNOWN"
+
 
 def wait_for_job_completion(job_id, check_interval=30):
     """
@@ -43,10 +49,10 @@ def wait_for_job_completion(job_id, check_interval=30):
         status = check_slurm_job_status(job_id)
         print(f"Job {job_id} status: {status}")
 
-        if status == 'COMPLETED':
+        if status == "COMPLETED":
             print(f"Job {job_id} has completed.")
             return status
-        elif status == 'FAILED':
+        elif status == "FAILED":
             print(f"Job {job_id} has failed.")
             return status
 

@@ -20,8 +20,9 @@ from nanotron.config import (
 )
 from nanotron.logging import human_format
 
+
 def generate_training_config(hf_url: str):
-    
+
     try:
         # Define model configuration for a tiny LLaMA model
         model_config = LlamaConfig(
@@ -93,7 +94,12 @@ def generate_training_config(hf_url: str):
         )
 
         # Define token arguments
-        tokens = TokensArgs(sequence_length=2048, train_steps=10, micro_batch_size=2, batch_accumulation_per_replica=4)
+        tokens = TokensArgs(
+            sequence_length=2048,
+            train_steps=10,
+            micro_batch_size=2,
+            batch_accumulation_per_replica=4,
+        )
 
         # Set up checkpoint path
         checkpoints_path = os.path.join(os.path.dirname(__file__), "checkpoints")
@@ -101,10 +107,16 @@ def generate_training_config(hf_url: str):
 
         # Define the configuration object
         config = Config(
-            general=GeneralArgs(project="debug", run="tiny_llama_%date_%jobid", seed=seed),
-            checkpoints=CheckpointsArgs(checkpoints_path=checkpoints_path, checkpoint_interval=10),
+            general=GeneralArgs(
+                project="debug", run="tiny_llama_%date_%jobid", seed=seed
+            ),
+            checkpoints=CheckpointsArgs(
+                checkpoints_path=checkpoints_path, checkpoint_interval=10
+            ),
             parallelism=parallelism,
-            model=ModelArgs(init_method=RandomInit(std=0.02), model_config=model_config),
+            model=ModelArgs(
+                init_method=RandomInit(std=0.02), model_config=model_config
+            ),
             tokenizer=TokenizerArgs("gpt2"),
             optimizer=optimizer,
             logging=LoggingArgs(),
@@ -147,7 +159,7 @@ def generate_training_config(hf_url: str):
         print("Configuration file saved as config.yaml")
 
         return True
-    
+
     except Exception as e:
         print(f"Failed to generate config: {e}")
         return False
@@ -155,8 +167,12 @@ def generate_training_config(hf_url: str):
 
 if __name__ == "__main__":
     # Argument parser for command-line arguments
-    parser = argparse.ArgumentParser(description="Generate training config for Nanotron")
-    parser.add_argument("--hf-url", type=str, required=True, help="The Hugging Face URL for the dataset")
+    parser = argparse.ArgumentParser(
+        description="Generate training config for Nanotron"
+    )
+    parser.add_argument(
+        "--hf-url", type=str, required=True, help="The Hugging Face URL for the dataset"
+    )
 
     args = parser.parse_args()
 
