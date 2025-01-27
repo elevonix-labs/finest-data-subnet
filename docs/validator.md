@@ -124,8 +124,16 @@ cd validator
 ### Running  Redis
 We should have redis running on the machine.
 
+If you didn't install sudo, install it first.
+
 ```bash
 sudo apt update
+sudo apt install sudo
+```
+
+Install redis
+
+```bash
 sudo apt install redis-server
 
 sudo service redis-server start
