@@ -144,13 +144,13 @@ async def main(config):
             if processing_success:
                 logging.info("Data processing completed successfully 🎉")
 
-                hf_repo_hash = upload_dataset(result_path, config.hf_repo)
+                hf_repo_id = upload_dataset(result_path, config.hf_repo)
                 
-                if hf_repo_hash:
+                if hf_repo_id:
                     while True:
                         try:
-                            logging.info(f"Committing dataset to subtensor chain {hf_repo_hash}:{config.hf_repo}")
-                            subtensor.commit(wallet, config.netuid, f"{hf_repo_hash}:{config.hf_repo}")
+                            logging.info(f"Committing dataset to subtensor chain {hf_repo_id}")
+                            subtensor.commit(wallet, config.netuid, f"{hf_repo_id}")
                             logging.info("🎉 Successfully committed dataset to subtensor chain 🎉")
                             break
                         except Exception as e:
@@ -167,7 +167,7 @@ async def main(config):
                             logging.info(f"Sending finish request for hotkey {hotkey} 📤")
                             message =f"{timestamp}{timezone}"
                             signature = generate_signature(wallet, message)
-                            response = send_finish_request(hotkey, message, signature, f"{hf_repo_hash}:{config.hf_repo}")
+                            response = send_finish_request(hotkey, message, signature, f"{hf_repo_id}")
                             if response:
                                 break
                         except Exception as e:
