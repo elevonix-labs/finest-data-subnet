@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 # Copyright © 2023 Yuma Rao
-# Copyright © 2023 cerebromesh
+# Copyright © 2023 Elevonix Labs
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
@@ -62,15 +62,15 @@ with codecs.open(
     version_string = version_match.group(1)
 
 setup(
-    name="data_refine_subnet",
+    name="FineWeb τ",
     version=version_string,
-    description="data_refine_subnet",
+    description="Dataset refining subnet on Bittensor by Elevonix Labs",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/cerebromesh-labs/data-refine-subnet",
-    author="cerebromesh.io", 
+    url="https://github.com/elevonix-labs/fineweb-subnet.git",
+    author="Elevonix Labs",
     include_package_data=True,
-    author_email="cerebromesh@cerebromesh.io",
+    author_email="tobiashomie@gmail.com",
     license="MIT",
     python_requires=">=3.8",
     install_requires=requirements,
