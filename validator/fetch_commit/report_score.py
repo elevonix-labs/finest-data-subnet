@@ -38,6 +38,7 @@ def report_score(config: bt.config, redis_queue: redis.Redis):
                 hotkey, _ = utils.assert_registered(wallet, metagraph)
                 signature = utils.generate_signature(wallet, f"{task_id}")
                 print(f"Report score for task_id: {score}")
+
                 max_retries = 10
                 retry_count = 0
 

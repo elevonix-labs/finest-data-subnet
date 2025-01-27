@@ -32,16 +32,15 @@ except LookupError:
     nltk.download('stopwords')
 
 class DataProcessor:
-    def __init__(self, warc_files, hf_url, hash, num_samples=30, bucket_name='commoncrawl'):
+    def __init__(self, warc_files, hf_url, num_samples=30, bucket_name='commoncrawl'):
         self.num_samples = num_samples
         self.bucket_name = bucket_name
         self.warc_files = warc_files
         self.hf_url = hf_url
-        self.hash = hash
         self.s3 = boto3.client('s3', region_name='us-west-1')
 
     def get_random_samples(self):
-        dataset = load_dataset(self.hf_url, split='train', revision=self.hash)
+        dataset = load_dataset(self.hf_url, split='train')
         random_indices = random.sample(range(len(dataset)), self.num_samples)
         random_samples = [dataset[i] for i in random_indices]
         return random_samples
