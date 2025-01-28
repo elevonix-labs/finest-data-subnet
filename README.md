@@ -1,6 +1,6 @@
 <div align="center">
 
-# **FineWeb τ** <!-- omit in toc -->
+# **Finesτ Daτa** <!-- omit in toc -->
 
 [![Discord Chat](https://img.shields.io/discord/308323056592486420.svg)](https://discord.gg/bittensor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -30,7 +30,7 @@ Here's the related blog post - [https://huggingface.co/spaces/HuggingFaceFW/blog
 
 In our project, we leverage the same algorithm used to create the FineWeb dataset to build our own, even larger, and higher-performing dataset. This dataset will be enhanced and powered by the decentralized Bittensor network.
 
-The **FineWeb τ** subnet implements an optimized dataset creation mechanism, featuring the following neuron types:
+The **Finesτ Daτa** subnet implements an optimized dataset creation mechanism, featuring the following neuron types:
 
 - Miners: Responsible for generating refined datasets from raw crawled data.
 - Validators: Tasked with evaluating the performance of miners and ensuring the quality of the datasets produced.

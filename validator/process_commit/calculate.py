@@ -17,8 +17,10 @@ def check_similarity(sample_similarities):
     else:
         return 1
 
+
 def calculate_data_quality(value, stderr):
     return value / (stderr + 1)
+
 
 def calculate_score(time_elapsed, value, stderr, sample_similarities, x=0.5):
     """
@@ -31,5 +33,5 @@ def calculate_score(time_elapsed, value, stderr, sample_similarities, x=0.5):
     data_quality = calculate_data_quality(value, stderr)
 
     score = (time_elapsed * x) + (data_quality * (1 - x))
-    
+
     return score

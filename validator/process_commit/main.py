@@ -18,13 +18,14 @@ from colorama import init, Fore
 # Initialize colorama
 init(autoreset=True)
 
+
 # Custom logging formatter to add colors and emojis
 class ColoredFormatter(logging.Formatter):
     COLORS = {
         "INFO": Fore.GREEN,
-        'WARNING': Fore.YELLOW,
-        'ERROR': Fore.RED,
-        'CRITICAL': Fore.MAGENTA,
+        "WARNING": Fore.YELLOW,
+        "ERROR": Fore.RED,
+        "CRITICAL": Fore.MAGENTA,
     }
 
     def format(self, record):
@@ -33,28 +34,36 @@ class ColoredFormatter(logging.Formatter):
         message = super().format(record)
         return f"{color} {message}"
 
+
 # Configure logging with color logging for console output
 logging.basicConfig(
-    format='%(asctime)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(levelname)s - %(message)s",
     level=logging.INFO,
     handlers=[
         logging.StreamHandler(),  # Outputs to the console
-        logging.FileHandler('commit_processing.log', mode='w')  # Logs to a file
+        logging.FileHandler("commit_processing.log", mode="w"),  # Logs to a file
     ],
 )
 
 logger = logging.getLogger()
 
 console_handler = logging.StreamHandler()
-console_handler.setFormatter(ColoredFormatter('%(asctime)s - %(levelname)s - %(message)s'))
-logger.handlers[0] = console_handler  # Replace the default stream handler with our colored one
+console_handler.setFormatter(
+    ColoredFormatter("%(asctime)s - %(levelname)s - %(message)s")
+)
+logger.handlers[0] = (
+    console_handler  # Replace the default stream handler with our colored one
+)
 
 
 def get_world_size():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--world_size", type=int, default=1, help="The number of GPUs to use")
+    parser.add_argument(
+        "--world_size", type=int, default=1, help="The number of GPUs to use"
+    )
     args = parser.parse_args()
     return args.world_size
+
 
 def process_commits(redis_queue: redis.Redis, world_size: int):
     """
@@ -69,41 +78,54 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
             result = redis_queue.blpop("commit_queue", timeout=1)
             if result:
                 start_time = time.time()
-                commit_data = json.loads(result[1].decode())  
-                uid = commit_data['uid']
-                current_commit = commit_data['current_commit']
-                commit_block = commit_data['commit_block']
+                commit_data = json.loads(result[1].decode())
+                uid = commit_data["uid"]
+                current_commit = commit_data["current_commit"]
+                commit_block = commit_data["commit_block"]
                 logging.info(f"Processing commit {current_commit} for UID {uid}")
 
-                max_retries = 5 
+                max_retries = 5
                 retry_count = 0
                 warc_files = None
                 request_block = None
                 while retry_count < max_retries:
                     try:
-                        response = requests.post(f"{os.getenv('API_URL')}/subnets/check-task/", json={"uid": int(uid)})
+                        response = requests.post(
+                            f"{os.getenv('API_URL')}/subnets/check-task/",
+                            json={"uid": int(uid)},
+                        )
                         if response.status_code == 200:
                             data = response.json()
-                            task_id = data.get('task_id')
-                            warc_files = data.get('warc_files')
-                            request_block = data.get('request_block')
+                            task_id = data.get("task_id")
+                            warc_files = data.get("warc_files")
+                            request_block = data.get("request_block")
                             break
                         elif response.status_code == 404:
                             break
                         else:
-                            logging.error(f"Can't get warc files now, trying again in 10 seconds {response.status_code}", exc_info=True)
+                            logging.error(
+                                f"Can't get warc files now, trying again in 10 seconds {response.status_code}",
+                                exc_info=True,
+                            )
                             time.sleep(10)
                             retry_count += 1
                     except Exception as e:
-                        logging.error(f"Can't get warc files now, trying again in 10 seconds {e}", exc_info=True)
+                        logging.error(
+                            f"Can't get warc files now, trying again in 10 seconds {e}",
+                            exc_info=True,
+                        )
                         time.sleep(10)
                         retry_count += 1
 
                 if not warc_files or not request_block:
-                    logging.error(f"Cannot find the latest task record of Miner-{uid}, skipping this commit...")
+                    logging.error(
+                        f"Cannot find the latest task record of Miner-{uid}, skipping this commit..."
+                    )
                     continue
 
-                logging.info(f"Received API response, warc_files: {warc_files}, request_block: {request_block}")
+                logging.info(
+                    f"Received API response, warc_files: {warc_files}, request_block: {request_block}"
+                )
 
                 # Data processing
                 logging.info("Starting check similarity process")
@@ -111,18 +133,28 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
 
                 sample_similarities = data_processor.run()
 
-                logging.info(f"Data processing completed with {len(sample_similarities)} similarities found. 📊")
+                logging.info(
+                    f"Data processing completed with {len(sample_similarities)} similarities found. 📊"
+                )
 
                 elapsed_time = (commit_block - request_block) * 12
                 # Training phase
                 if generate_training_config(current_commit):
-                    training_success = start_training_and_kill('config.yaml', world_size)
+                    training_success = start_training_and_kill(
+                        "config.yaml", world_size
+                    )
                     logging.info(f"Training success: {training_success}")
                     if training_success:
                         # Evaluation phase
                         matches = run_lighteval(world_size)
 
-                        values, stderrs = zip(*[(float(match[1]), float(match[2])) for match in matches if match[0] == 'truthfulqa_mc2'])
+                        values, stderrs = zip(
+                            *[
+                                (float(match[1]), float(match[2]))
+                                for match in matches
+                                if match[0] == "truthfulqa_mc2"
+                            ]
+                        )
                         if values and stderrs:
                             mean_value = np.mean(values)
                             mean_stderr = np.mean(stderrs)
@@ -131,13 +163,12 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
                             mean_stderr = 0.0
 
                         # Score calculation
-                        score = calculate_score(elapsed_time, mean_value, mean_stderr, sample_similarities)
+                        score = calculate_score(
+                            elapsed_time, mean_value, mean_stderr, sample_similarities
+                        )
                         raw_score = redis_queue.hget("scores", uid)
                         current_score = json.loads(raw_score) if raw_score else 0
-                        report_data = {
-                            "task_id": task_id,
-                            "score": score
-                        }
+                        report_data = {"task_id": task_id, "score": score}
                         logging.info(f"Previous Score: {current_score}")
                         logging.info(f"New Score: {score}")
                         logging.info(f"Calculated score for UID {uid}: {score}")
@@ -152,9 +183,10 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
             logging.warning(f"Can't process commit now, try again in 10 seconds {e}")
             time.sleep(10)
 
+
 if __name__ == "__main__":
-    
-    redis_queue = redis.Redis(host='localhost', port=6379, db=0)
+
+    redis_queue = redis.Redis(host="localhost", port=6379, db=0)
     logging.info("Starting process commits 🚀")
     world_size = get_world_size()
     process_commits(redis_queue, world_size)

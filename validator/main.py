@@ -3,51 +3,94 @@ import argparse
 from multiprocessing import Process
 from dotenv import load_dotenv
 
+
 def run_fetch_commits(args=None):
     # Run fetch_commits in the bittensor environment
-    command = ['.venv/bin/python', 'main.py',
-               '--netuid', args.netuid,
-               '--wallet.name', args.wallet_name,
-               '--wallet.hotkey', args.wallet_hotkey,
-               '--subtensor.network', args.subtensor_network
-               ]
-    subprocess.run(command, check=True, cwd='fetch_commit')
+    command = [
+        ".venv/bin/python",
+        "main.py",
+        "--netuid",
+        args.netuid,
+        "--wallet.name",
+        args.wallet_name,
+        "--wallet.hotkey",
+        args.wallet_hotkey,
+        "--subtensor.network",
+        args.subtensor_network,
+    ]
+    subprocess.run(command, check=True, cwd="fetch_commit")
+
 
 def run_report_score(args=None):
     # Run report_score in the bittensor environment
-    subprocess.run([
-        '.venv/bin/python', 'report_score.py',
-        '--netuid', args.netuid,
-        '--wallet.name', args.wallet_name,
-        '--wallet.hotkey', args.wallet_hotkey,
-        '--subtensor.network', args.subtensor_network
-    ], check=True, cwd='fetch_commit')
+    subprocess.run(
+        [
+            ".venv/bin/python",
+            "report_score.py",
+            "--netuid",
+            args.netuid,
+            "--wallet.name",
+            args.wallet_name,
+            "--wallet.hotkey",
+            args.wallet_hotkey,
+            "--subtensor.network",
+            args.subtensor_network,
+        ],
+        check=True,
+        cwd="fetch_commit",
+    )
+
 
 def run_process_commits(args=None):
     # Run process_commits in the nanotron environment
-    subprocess.run([
-        '.venv/bin/python', 'main.py',
-        '--world_size', args.world_size,
-    ], check=True, cwd='process_commit')
+    subprocess.run(
+        [
+            ".venv/bin/python",
+            "main.py",
+            "--world_size",
+            args.world_size,
+        ],
+        check=True,
+        cwd="process_commit",
+    )
+
 
 def run_weight_setter(args=None):
     # Run weight_setter in the bittensor environment
-    subprocess.run([
-        '.venv/bin/python', 'weight_setter.py',
-        '--netuid', args.netuid,
-        '--wallet.name', args.wallet_name,
-        '--wallet.hotkey', args.wallet_hotkey,
-        '--subtensor.network', args.subtensor_network
-    ], check=True, cwd='fetch_commit')
+    subprocess.run(
+        [
+            ".venv/bin/python",
+            "weight_setter.py",
+            "--netuid",
+            args.netuid,
+            "--wallet.name",
+            args.wallet_name,
+            "--wallet.hotkey",
+            args.wallet_hotkey,
+            "--subtensor.network",
+            args.subtensor_network,
+        ],
+        check=True,
+        cwd="fetch_commit",
+    )
+
 
 def main():
     try:
-        parser = argparse.ArgumentParser(description="Run fetch_commits with specified arguments.")
-        parser.add_argument('--netuid', type=str,  help="The unique identifier for the network")
-        parser.add_argument('--wallet_name', type=str,  help="The wallet name")
-        parser.add_argument('--wallet_hotkey', type=str,  help="The wallet hotkey")
-        parser.add_argument('--subtensor_network', type=str, help="The subtensor network")
-        parser.add_argument('--world_size', type=str, default=1, help="The number of GPUs to use")
+        parser = argparse.ArgumentParser(
+            description="Run fetch_commits with specified arguments."
+        )
+        parser.add_argument(
+            "--netuid", type=str, help="The unique identifier for the network"
+        )
+        parser.add_argument("--wallet_name", type=str, help="The wallet name")
+        parser.add_argument("--wallet_hotkey", type=str, help="The wallet hotkey")
+        parser.add_argument(
+            "--subtensor_network", type=str, help="The subtensor network"
+        )
+        parser.add_argument(
+            "--world_size", type=str, default=1, help="The number of GPUs to use"
+        )
 
         # Parse the arguments
         args = parser.parse_args()
@@ -73,6 +116,7 @@ def main():
         process_process.terminate()
         weight_setter_process.terminate()
         report_score_process.terminate()
+
 
 if __name__ == "__main__":
 

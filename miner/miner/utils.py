@@ -1,5 +1,6 @@
 import bittensor as bt
 
+
 def assert_registered(wallet: bt.wallet, metagraph: bt.metagraph) -> int:
     """Asserts the wallet is a registered miner and returns the miner's UID.
 

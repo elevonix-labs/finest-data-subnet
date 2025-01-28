@@ -54,7 +54,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 # loading version from setup.py
 with codecs.open(
-    os.path.join(here, "data_refine/__init__.py"), encoding="utf-8"
+    os.path.join(here, "finest-data/__init__.py"), encoding="utf-8"
 ) as init_file:
     version_match = re.search(
         r"^__version__ = ['\"]([^'\"]*)['\"]", init_file.read(), re.M
@@ -62,15 +62,15 @@ with codecs.open(
     version_string = version_match.group(1)
 
 setup(
-    name="FineWeb τ",
+    name="Finesτ Daτa",
     version=version_string,
     description="Dataset refining subnet on Bittensor by Elevonix Labs",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/elevonix-labs/fineweb-subnet.git",
+    url="https://github.com/elevonix-labs/finest-data-subnet.git",
     author="Elevonix Labs",
     include_package_data=True,
-    author_email="tobiashomie@gmail.com",
+    author_email="tobias@elevonix.io",
     license="MIT",
     python_requires=">=3.8",
     install_requires=requirements,
