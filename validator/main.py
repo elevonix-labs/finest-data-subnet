@@ -86,10 +86,10 @@ def main():
             default=63,
             help="The unique identifier for the network",
         )
-        parser.add_argument("--wallet_name", type=str, help="The wallet name")
-        parser.add_argument("--wallet_hotkey", type=str, help="The wallet hotkey")
+        parser.add_argument("--wallet_name", type=str, required=True, help="The wallet name")
+        parser.add_argument("--wallet_hotkey", type=str, required=True, help="The wallet hotkey")
         parser.add_argument(
-            "--subtensor_network", type=str, help="The subtensor network"
+            "--subtensor_network", default="finney", type=str, help="The subtensor network"
         )
         parser.add_argument(
             "--world_size", type=str, default=1, help="The number of GPUs to use"
