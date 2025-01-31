@@ -84,11 +84,12 @@ def get_config() -> bt.config:
     parser = argparse.ArgumentParser(
         description="Upload dataset to Hugging Face and commit dataset URL to Bittensor subtensor chain."
     )
-    # parser.add_argument("--hf_repo", type=str,  help="The Hugging Face repository to upload the dataset.")
     parser.add_argument(
-        "--netuid", type=str, default=250, help="The unique identifier for the network."
+        "--netuid", type=int, default=63, help="The unique identifier for the network."
     )
-    parser.add_argument("--hf_repo", type=str, help="Link to the repo on huggingface.")
+    parser.add_argument(
+        "--hf_repo", type=str, help="The Hugging Face repository to upload the dataset."
+    )
     parser.add_argument(
         "--total_tasks", type=int, default=4, help="Total number of tasks"
     )

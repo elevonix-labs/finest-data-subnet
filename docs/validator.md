@@ -155,19 +155,34 @@ Make sure you have the necessary environment setup. You should have a Bittensor 
 
 You can run the script using the following command:
 
+- Mainnet
 ```bash
-poetry run python main.py --netuid netuid --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey --subtensor.network test [--world_size gpu_count]
+poetry run python main.py --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count]
 ```
 
 Example
 
 ```bash
-poetry run python main.py --netuid 250 --wallet_name test-validator --wallet_hotkey h1 --subtensor_network test --world_size 1
+poetry run python main.py --wallet_name validator --wallet_hotkey default --world_size 1
 ```
-
 Or run with pm2
 ```bash
-pm2 start main.py --name validator --interpreter .venv/bin/python -- --netuid 250 --wallet_name test-validator --wallet_hotkey h1 --subtensor_network test --world_size 1
+pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_name validator --wallet_hotkey default --world_size 1
+```
+
+- Testnet
+```bash
+poetry run python main.py --netuid <netuid> --subtensor.network test --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count]
+```
+
+Example
+
+```bash
+poetry run python main.py --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
+```
+Or run with pm2
+```bash
+pm2 start main.py --name test-validator --interpreter .venv/bin/python -- --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
 ```
 
 **Explanation of the arguments:**
