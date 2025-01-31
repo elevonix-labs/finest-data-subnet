@@ -8,7 +8,7 @@ cd ..
 
 cd process_commit
 poetry install
-pip install flash-attn
+pip install flash-attn==2.7.3
 poetry run pip install flash-attn==2.7.3
 cd ..
 
