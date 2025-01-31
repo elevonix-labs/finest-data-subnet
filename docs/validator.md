@@ -145,11 +145,32 @@ Check if redis is running
 redis-cli ping
 ```
 
-## Getting Commit
 
-### 1. Prepare the Environment
+## Running Validator
 
+### 1. Creating Bittensor wallet.
 Make sure you have the necessary environment setup. You should have a Bittensor wallet and access to the Bittensor subtensor chain.
+
+You can active poetry venv for creating wallet.
+
+```bash
+source fetch_commit/.venv/bin/activate
+```
+
+- Creating a coldkey using `btcli`
+
+`btcli wallet new_coldkey --wallet.name <my_coldkey>`
+For example,
+`btcli wallet new_coldkey --wallet.name test-coldkey`
+
+- Creating a hotkey using `btcli`
+
+`btcli wallet new_hotkey --wallet.name <my_coldkey> --wallet.hotkey <my_hotkey>`
+For example,
+`btcli wallet new_hotkey --wallet.name test-coldkey --wallet.hotkey test-hotkey`
+
+You can check more about it in [bittensor docs](https://docs.bittensor.com/working-with-keys)
+
 
 ### 2. Running the Script
 

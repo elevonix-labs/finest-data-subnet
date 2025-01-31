@@ -13,8 +13,8 @@ Before you go to miner, ensure you have the necessary packages and configuration
 #### Recommended Hardware
 
 - **CPU**: As many as possible( 40-core processor or higher recommended)
-- **RAM**: 128 GB or higher
-- **Storage**: 256 GB free disk space for dataset storage and processing
+- **RAM**: 32 GB or higher
+- **Storage**: 128 GB free disk space for dataset storage and processing
 
 ### 2. **Slurm Configuration**
 
@@ -354,6 +354,29 @@ Ensure you have the required dependencies installed. You can use the following c
 cd miner
 poetry install
 ```
+
+### Creating Bittensor wallet.
+
+You can active poetry venv for creating wallet.
+
+```bash
+source .venv/bin/activate
+```
+
+- Creating a coldkey using `btcli`
+
+`btcli wallet new_coldkey --wallet.name <my_coldkey>`
+For example,
+`btcli wallet new_coldkey --wallet.name test-coldkey`
+
+- Creating a hotkey using `btcli`
+
+`btcli wallet new_hotkey --wallet.name <my_coldkey> --wallet.hotkey <my_hotkey>`
+For example,
+`btcli wallet new_hotkey --wallet.name test-coldkey --wallet.hotkey test-hotkey`
+
+You can check more about it in [bittensor docs](https://docs.bittensor.com/working-with-keys)
+
 
 ## Running miner
 
