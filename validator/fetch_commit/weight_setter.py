@@ -75,25 +75,28 @@ def main(config: bt.config, subtensor: bt.subtensor):
 
     logging.info("Started main loop to periodically set weights.")
 
-    while True:
-        try:
-            if subtensor.get_current_block() % 100 == 0:
-                metagraph: bt.metagraph = subtensor.metagraph(config.netuid)
-                redis_queue = redis.Redis(host="localhost", port=6379, db=0)
-                raw_scores = redis_queue.hgetall("scores")
-                scores = [
-                    float(raw_scores.get(bytes(str(uid), "utf-8"), b"0"))
-                    for uid in metagraph.uids
-                ]
+    try :
+        while True:
+            try:
+                if subtensor.get_current_block() % 100 == 0:
+                    metagraph: bt.metagraph = subtensor.metagraph(config.netuid)
+                    redis_queue = redis.Redis(host="localhost", port=6379, db=0)
+                    raw_scores = redis_queue.hgetall("scores")
+                    scores = [
+                        float(raw_scores.get(bytes(str(uid), "utf-8"), b"0"))
+                        for uid in metagraph.uids
+                    ]
 
-                logging.info(f"Setting weights for {len(scores)} UIDs...")
-                set_weights(scores, config, metagraph, subtensor)
-                logging.info("Waiting for next cycle...")
-                time.sleep(10)
+                    logging.info(f"Setting weights for {len(scores)} UIDs...")
+                    set_weights(scores, config, metagraph, subtensor)
+                    logging.info("Waiting for next cycle...")
+                    time.sleep(10)
 
-        except Exception as e:
-            logging.error(f"An error occurred in the main loop: {e}", exc_info=True)
+            except Exception as e:
+                logging.error(f"An error occurred in the main loop: {e}", exc_info=True)
 
+    except KeyboardInterrupt:
+        print("\n🔴Weight setter Process interrupted by user.")
 
 if __name__ == "__main__":
 
