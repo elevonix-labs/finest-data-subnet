@@ -21,8 +21,8 @@ def get_config():
     )
     parser.add_argument(
         "--netuid",
-        type=str,
-        default="250",
+        type=int,
+        default=63,
         help="The unique identifier for the network",
     )
     # Add Bittensor-specific arguments

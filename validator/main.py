@@ -81,7 +81,10 @@ def main():
             description="Run fetch_commits with specified arguments."
         )
         parser.add_argument(
-            "--netuid", type=str, help="The unique identifier for the network"
+            "--netuid",
+            type=int,
+            default=63,
+            help="The unique identifier for the network",
         )
         parser.add_argument("--wallet_name", type=str, help="The wallet name")
         parser.add_argument("--wallet_hotkey", type=str, help="The wallet hotkey")

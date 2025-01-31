@@ -359,24 +359,36 @@ poetry install
 
 You can run the pipeline using the provided script. Here's an example command to execute the script:
 
+- Mainnet
 ```bash
-poetry run python miner/main.py --netuid 250 --hf_repo your_hf_repo --wallet.name your_wallet_name --wallet.hotkey your_wallet_hotkey [--total_tasks total_task] [--cpus_per_task your_cpus_number]
+poetry run python miner/main.py --hf_repo your_hf_repo --wallet.name your_wallet_name --wallet.hotkey your_wallet_hotkey [--total_tasks total_task] [--cpus_per_task your_cpus_number]
 ```
-
 Example:
-
 ```bash
-poetry run python miner/main.py --netuid 250 --hf_repo tobiashomie/finest_dataset --wallet.name test-miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32 --subtensor.network test
+poetry run python miner/main.py --hf_repo tobiashomie/finest_dataset --wallet.name miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32
 ```
-
-
 Or run with pm2
 ```bash
-pm2 start miner/main.py --name miner --interpreter .venv/bin/python -- --netuid 250 --hf_repo tobiashomie/finest_dataset --wallet.name test-miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32 --subtensor.network test
+pm2 start miner/main.py --name miner --interpreter .venv/bin/python -- --hf_repo tobiashomie/finest_dataset --wallet.name miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32
+```
+
+
+
+- Testnet
+```bash
+poetry run python miner/main.py --netuid 250 --subtensor.network test --hf_repo your_hf_repo --wallet.name your_wallet_name --wallet.hotkey your_wallet_hotkey [--total_tasks total_task] [--cpus_per_task your_cpus_number]
+```
+Example:
+```bash
+poetry run python miner/main.py --netuid 250 --subtensor.network test --hf_repo tobiashomie/finest_dataset --wallet.name test-miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32
+```
+Or run with pm2
+```bash
+pm2 start miner/main.py --name test-miner --interpreter .venv/bin/python -- --netuid 250 --subtensor.network test --hf_repo tobiashomie/finest_dataset --wallet.name test-miner --wallet.hotkey h1 --total_tasks 4 --cpus_per_task 32
 ```
 
 **Explanation of the arguments:**
-- **--netuid**, **--wallet_name**, **--wallet_hotkey**, **--subtensor_network**: These arguments are used to specify the wallet name, hotkey, subtensor network of bittensor network. Plz check (bittensor docs)[https://docs.bittensor.com/] for more details.
+- **--netuid**, **--subtensor_network, **--wallet_name**, **--wallet_hotkey****: These arguments are used to specify the wallet name, hotkey, bittensor network. Please check (bittensor docs)[https://docs.bittensor.com/] for more details.
 - **--total_tasks**: This argument sets the total number of tasks to be processed. It can reflect distribute tasks across resources.
 - **--cpus_per_task**: This argument sets the number of CPUs per task. This is likely used to allocate CPU resources for each task
 
