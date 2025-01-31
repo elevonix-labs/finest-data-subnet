@@ -290,6 +290,13 @@ Now, you should be able to run:
 poetry --version
 ```
 
+### Installing PM2 (optional)
+
+```bash
+sudo apt install nodejs && npm
+npm install -g pm2@latest
+```
+
 ### Getting code
 
 ```bash
