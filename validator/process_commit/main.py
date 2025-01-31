@@ -196,7 +196,5 @@ def main():
 
 if __name__ == "__main__":
 
-    redis_queue = redis.Redis(host="localhost", port=6379, db=0)
-    logging.info("Starting commit processing 🚀")
-    world_size = get_world_size()
-    process_commits(redis_queue, world_size)
+    main()
+
