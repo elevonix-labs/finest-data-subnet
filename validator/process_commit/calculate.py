@@ -12,10 +12,7 @@ def check_similarity(sample_similarities):
     threshold_count = 0.3 * len(sample_similarities)
     count = sum(1 for similarity in sample_similarities if similarity <= 70)
 
-    if count >= threshold_count:
-        return 0
-    else:
-        return 1
+    return 0 if count >= threshold_count else 1
 
 
 def calculate_data_quality(value, stderr):
@@ -27,7 +24,7 @@ def calculate_score(time_elapsed, value, stderr, sample_similarities, x=0.5):
     Calculate a score based on time elapsed, value, and sample similarities.
     """
 
-    # Check if 70% of sample similarities are over 70
+    # Verify if 70% of sample similarities exceed 70
     if check_similarity(sample_similarities) == 0:
         return 0
     data_quality = calculate_data_quality(value, stderr)

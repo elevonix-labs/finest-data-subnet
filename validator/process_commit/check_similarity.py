@@ -13,17 +13,12 @@ from nltk.corpus import stopwords
 from collections import Counter
 from utils import extract_commit
 
+# Ensure necessary NLTK packages are available
 try:
     nltk.data.find("tokenizers/punkt")
 except LookupError:
     print("Downloading 'punkt' package...")
     nltk.download("punkt")
-
-# try:
-#     nltk.data.find('tokenizers/punkt_tab')
-# except LookupError:
-#     print("Downloading 'punkt_tab' package...")
-#     nltk.download('punkt_tab')
 
 try:
     nltk.data.find("corpora/stopwords")
@@ -43,15 +38,14 @@ class DataProcessor:
     def get_random_samples(self):
         dataset = load_dataset(self.hf_url, split="train")
         random_indices = random.sample(range(len(dataset)), self.num_samples)
-        random_samples = [dataset[i] for i in random_indices]
-        return random_samples
+        return [dataset[i] for i in random_indices]
 
     def download_warc_file(self, warc_path):
         try:
             response = self.s3.get_object(Bucket=self.bucket_name, Key=warc_path)
             return BytesIO(response["Body"].read())
         except Exception as e:
-            print(f"Error downloading {warc_path}: {e}")
+            print(f"Failed to download {warc_path}: {e}")
             return None
 
     def find_text_by_id(self, warc_file_stream, ids_to_find):
@@ -101,10 +95,7 @@ class DataProcessor:
         def tokenize_and_filter(text):
             stop_words = set(stopwords.words("english"))
             words = nltk.word_tokenize(text.lower())
-            filtered_words = [
-                word for word in words if word.isalpha() and word not in stop_words
-            ]
-            return filtered_words
+            return [word for word in words if word.isalpha() and word not in stop_words]
 
         original_words = tokenize_and_filter(original_text)
         refined_words = tokenize_and_filter(refined_text)
@@ -114,10 +105,9 @@ class DataProcessor:
 
         matching_words = sum((original_word_count & refined_word_count).values())
 
-        if len(refined_words) == 0:
+        if not refined_words:
             return 0
-        match_percentage = (matching_words / len(refined_words)) * 100
-        return match_percentage
+        return (matching_words / len(refined_words)) * 100
 
     def run(self):
         random_samples = self.get_random_samples()
