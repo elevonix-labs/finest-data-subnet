@@ -152,9 +152,17 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
         )
 
 
+def main():
+
+    try:
+
+        redis_queue = redis.Redis(host="localhost", port=6379, db=0)
+        config = utils.get_config()
+        fetch_commits(config, redis_queue)
+
+    except KeyboardInterrupt:
+        print("\n🔴Fetch commit Process interrupted by user")
+
 if __name__ == "__main__":
 
-    redis_queue = redis.Redis(host="localhost", port=6379, db=0)
-
-    config = utils.get_config()
-    fetch_commits(config, redis_queue)
+    main()
