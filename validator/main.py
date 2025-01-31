@@ -82,8 +82,8 @@ def main():
         )
         parser.add_argument(
             "--netuid",
-            type=int,
-            default=63,
+            type=str,
+            default="63",
             help="The unique identifier for the network",
         )
         parser.add_argument("--wallet_name", type=str, required=True, help="The wallet name")
