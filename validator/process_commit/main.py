@@ -15,7 +15,7 @@ from calculate import calculate_score
 
 from colorama import init, Fore
 
-# Initialize colorama
+# Initialize colorama for colored console output
 init(autoreset=True)
 
 
@@ -35,7 +35,7 @@ class ColoredFormatter(logging.Formatter):
         return f"{color} {message}"
 
 
-# Configure logging with color logging for console output
+# Configure logging with color support for console output
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
     level=logging.INFO,
@@ -67,7 +67,7 @@ def get_world_size():
 
 def process_commits(redis_queue: redis.Redis, world_size: int):
     """
-    Async task to process commits from the queue with logging.
+    Asynchronous task to handle commits from the queue with logging.
     """
     redis_queue.delete("commit_queue")
     redis_queue.delete("report_score")
@@ -104,14 +104,14 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
                             break
                         else:
                             logging.error(
-                                f"Can't get warc files now, trying again in 10 seconds {response.status_code}",
+                                f"Unable to retrieve warc files, retrying in 10 seconds {response.status_code}",
                                 exc_info=True,
                             )
                             time.sleep(10)
                             retry_count += 1
                     except Exception as e:
                         logging.error(
-                            f"Can't get warc files now, trying again in 10 seconds {e}",
+                            f"Unable to retrieve warc files, retrying in 10 seconds {e}",
                             exc_info=True,
                         )
                         time.sleep(10)
@@ -119,16 +119,16 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
 
                 if not warc_files or not request_block:
                     logging.error(
-                        f"Cannot find the latest task record of Miner-{uid}, skipping this commit..."
+                        f"Cannot find the latest task record for Miner-{uid}, skipping this commit..."
                     )
                     continue
 
                 logging.info(
-                    f"Received API response, warc_files: {warc_files}, request_block: {request_block}"
+                    f"API response received, warc_files: {warc_files}, request_block: {request_block}"
                 )
 
                 # Data processing
-                logging.info("Starting check similarity process")
+                logging.info("Initiating similarity check process")
                 data_processor = DataProcessor(warc_files, current_commit)
 
                 sample_similarities = data_processor.run()
@@ -180,7 +180,7 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
                 print(f"No commit data found in commit queue...")
                 time.sleep(10)
         except Exception as e:
-            logging.warning(f"Can't process commit now, try again in 10 seconds {e}")
+            logging.warning(f"Unable to process commit now, retrying in 10 seconds {e}")
             time.sleep(10)
 
 
@@ -196,5 +196,7 @@ def main():
 
 if __name__ == "__main__":
 
-    main()
-
+    redis_queue = redis.Redis(host="localhost", port=6379, db=0)
+    logging.info("Starting commit processing 🚀")
+    world_size = get_world_size()
+    process_commits(redis_queue, world_size)

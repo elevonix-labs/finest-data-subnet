@@ -74,9 +74,9 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
         # Ensure the wallet is registered
         hotkey, uid = utils.assert_registered(wallet, metagraph)
 
-        logging.info(f"Validator: {hotkey} is registered with uid: {uid}")
+        logging.info(f"Validator {hotkey} is successfully registered with UID {uid}.")
 
-        logging.info("Started fetching commits...")
+        logging.info("Initiating the commit fetching process...")
 
         while True:
             logging.info("Fetching commits...")
@@ -120,7 +120,7 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
                         > 7200
                     ):
                         logging.warning(
-                            f"Commit for UID {uid} is skipped one day, Updating score"
+                            f"Commit for UID {uid} has not changed in over a day, updating score."
                         )
                         previous_commits[uid] = (
                             current_commit,
@@ -132,22 +132,22 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
                         redis_queue.hset("scores", int(uid), json.dumps(updated_score))
                     else:
                         logging.warning(
-                            f"No commit for UID {uid} or commit is not changed in one day, skipping"
+                            f"No new commit for UID {uid} or commit unchanged for a day, skipping."
                         )
                         continue
                 except Exception as e:
                     logging.error(
-                        f"Error fetching commit for UID {uid}: {e}, skipping",
+                        f"Encountered an error while fetching commit for UID {uid}: {e}. Skipping this UID.",
                         exc_info=True,
                     )
 
             # Sleep for the interval defined in config
-            logging.info("Sleeping 5 mins for next fetching commits")
+            logging.info("Pausing for 5 minutes before the next commit fetch cycle.")
             time.sleep(5 * 60)
 
     except Exception as e:
         logging.error(
-            f"Can't fetch commits now, Plz check all config and try again {e}",
+            f"Unable to fetch commits at this time. Please verify the configuration and try again. Error: {e}",
             exc_info=True,
         )
 

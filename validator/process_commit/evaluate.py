@@ -9,10 +9,10 @@ from contextlib import closing
 
 def find_free_port() -> int:
     """
-    Find and return a free port number.
+    Locate and return an available port number.
 
     Returns:
-        int: A free port number.
+        int: An available port number.
     """
     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
         s.bind(("", 0))
@@ -21,10 +21,10 @@ def find_free_port() -> int:
 
 def run_lighteval(world_size: int = 1) -> list:
     """
-    Run the lighteval command and return the extracted results.
+    Execute the lighteval command and retrieve the results.
 
     Args:
-        world_size (int): The number of processes (usually corresponds to the number of GPUs).
+        world_size (int): The number of processes, typically matching the number of GPUs.
 
     Returns:
         list: Extracted metrics, values, and stderr from the log output.
@@ -44,10 +44,10 @@ def run_lighteval(world_size: int = 1) -> list:
 
 def setup_environment(world_size: int) -> dict:
     """
-    Set up and return the environment variables for the process.
+    Configure and return the environment variables for the process.
 
     Args:
-        world_size (int): The number of processes (usually corresponds to the number of GPUs).
+        world_size (int): The number of processes, typically matching the number of GPUs.
 
     Returns:
         dict: Environment variables.
@@ -63,10 +63,10 @@ def setup_environment(world_size: int) -> dict:
 
 def run_process(command: list, env: dict) -> str:
     """
-    Run the given command and capture its output.
+    Execute the specified command and capture its output.
 
     Args:
-        command (list): The command to run.
+        command (list): The command to execute.
         env (dict): The environment variables for the command.
 
     Returns:
@@ -116,13 +116,13 @@ def run_process(command: list, env: dict) -> str:
 
 def handle_process_termination(process: subprocess.Popen) -> int:
     """
-    Handle the termination of a process and return its return code.
+    Manage the termination of a process and return its exit code.
 
     Args:
         process (subprocess.Popen): The process to terminate.
 
     Returns:
-        int: The return code of the process.
+        int: The exit code of the process.
     """
     try:
         return_code = process.wait(timeout=10)
@@ -140,7 +140,7 @@ def handle_process_termination(process: subprocess.Popen) -> int:
 
 def parse_log_output(log_output: str) -> list:
     """
-    Extract relevant information from the log output.
+    Extract relevant data from the log output.
 
     Args:
         log_output (str): The log output from the command.
