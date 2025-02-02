@@ -62,7 +62,7 @@ def set_weights(
         )
 
         if result:
-            logging.info("set_weights on chain successfully!")
+            logging.info("🚀 set_weights on chain successfully!")
         else:
             logging.error(f"set_weights failed: {msg}")
 
@@ -75,7 +75,7 @@ def main(config: bt.config, subtensor: bt.subtensor):
 
     logging.info("Started main loop to periodically set weights.")
 
-    try :
+    try:
         while True:
             try:
                 if subtensor.get_current_block() % 100 == 0:
@@ -97,6 +97,7 @@ def main(config: bt.config, subtensor: bt.subtensor):
 
     except KeyboardInterrupt:
         print("\n🔴Weight setter Process interrupted by user.")
+
 
 if __name__ == "__main__":
 

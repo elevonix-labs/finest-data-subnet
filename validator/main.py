@@ -1,9 +1,8 @@
 import subprocess
 import argparse
-import os
 from multiprocessing import Process
 from dotenv import load_dotenv
-import signal
+
 
 # Handle termination signals gracefully
 def terminate_processes(processes):
@@ -13,6 +12,7 @@ def terminate_processes(processes):
             process.join(timeout=5)  # Allow some time for a clean exit
             if process.is_alive():
                 process.kill()  # Forcefully terminate if still running
+
 
 def run_fetch_commits(args):
     command = [
@@ -26,8 +26,11 @@ def run_fetch_commits(args):
         args.wallet_hotkey,
         "--subtensor.network",
         args.subtensor_network,
+        "--subtensor.chain_endpoint",
+        args.subtensor_chain_endpoint,
     ]
     subprocess.run(command, check=True, cwd="fetch_commit")
+
 
 def run_report_score(args):
     subprocess.run(
@@ -42,10 +45,13 @@ def run_report_score(args):
             args.wallet_hotkey,
             "--subtensor.network",
             args.subtensor_network,
+            "--subtensor.chain_endpoint",
+            args.subtensor_chain_endpoint,
         ],
         check=True,
         cwd="fetch_commit",
     )
+
 
 def run_process_commits(args):
     subprocess.run(
@@ -58,6 +64,7 @@ def run_process_commits(args):
         check=True,
         cwd="process_commit",
     )
+
 
 def run_weight_setter(args):
     subprocess.run(
@@ -72,15 +79,18 @@ def run_weight_setter(args):
             args.wallet_hotkey,
             "--subtensor.network",
             args.subtensor_network,
+            "--subtensor.chain_endpoint",
+            args.subtensor_chain_endpoint,
         ],
         check=True,
         cwd="fetch_commit",
     )
 
+
 def main():
     try:
         parser = argparse.ArgumentParser(
-            description="Execute fetch_commits with the provided arguments."
+            description="Execute validator code with the provided arguments."
         )
         parser.add_argument(
             "--netuid",
@@ -88,20 +98,48 @@ def main():
             default="63",
             help="The unique identifier for the network",
         )
-        parser.add_argument("--wallet_name", type=str, required=True, help="The wallet name")
-        parser.add_argument("--wallet_hotkey", type=str, required=True, help="The wallet hotkey")
-        parser.add_argument("--subtensor_network", default="finney", type=str, help="The subtensor network")
-        parser.add_argument("--world_size", type=int, default=1, help="The number of GPUs to utilize")
+        parser.add_argument(
+            "--wallet_name", type=str, required=True, help="The wallet name"
+        )
+        parser.add_argument(
+            "--wallet_hotkey", type=str, required=True, help="The wallet hotkey"
+        )
+        parser.add_argument(
+            "--subtensor_network",
+            default="finney",
+            type=str,
+            help="The subtensor network",
+        )
+        parser.add_argument(
+            "--subtensor_chain_endpoint",
+            default="",
+            type=str,
+            help="The subtensor network endpoint",
+        )
+        parser.add_argument(
+            "--world_size", type=int, default=1, help="The number of GPUs to utilize"
+        )
 
         args = parser.parse_args()
+
+        # Verify validity of the validator
 
         # Initialize process objects
         fetch_process = Process(target=run_fetch_commits, args=(args,), daemon=True)
         process_process = Process(target=run_process_commits, args=(args,), daemon=True)
-        weight_setter_process = Process(target=run_weight_setter, args=(args,), daemon=True)
-        report_score_process = Process(target=run_report_score, args=(args,), daemon=True)
+        weight_setter_process = Process(
+            target=run_weight_setter, args=(args,), daemon=True
+        )
+        report_score_process = Process(
+            target=run_report_score, args=(args,), daemon=True
+        )
 
-        processes = [fetch_process, process_process, weight_setter_process, report_score_process]
+        processes = [
+            fetch_process,
+            process_process,
+            weight_setter_process,
+            report_score_process,
+        ]
 
         # Launch processes
         for process in processes:
@@ -122,6 +160,7 @@ def main():
 
     finally:
         terminate_processes(processes)
+
 
 if __name__ == "__main__":
     load_dotenv()

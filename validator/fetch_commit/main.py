@@ -1,5 +1,3 @@
-import os
-import sys
 import time
 import logging
 from typing import Any, cast
@@ -162,6 +160,7 @@ def main():
 
     except KeyboardInterrupt:
         print("\n🔴Fetch commit Process interrupted by user")
+
 
 if __name__ == "__main__":
 
