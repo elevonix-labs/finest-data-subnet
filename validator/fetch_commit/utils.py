@@ -34,7 +34,7 @@ def get_config():
     return config
 
 
-def assert_registered(wallet: bt.wallet, metagraph: bt.metagraph) -> int:
+def assert_registered(wallet: bt.wallet, metagraph: bt.metagraph):
     """Asserts the wallet is a registered miner and returns the miner's UID.
 
     Raises:
@@ -50,6 +50,35 @@ def assert_registered(wallet: bt.wallet, metagraph: bt.metagraph) -> int:
     )
 
     return wallet.hotkey.ss58_address, uid
+
+
+def assert_sufficient_stake(
+    wallet: bt.wallet, metagraph: bt.metagraph, required_stake: float = 4096
+) -> bool:
+    """Asserts the wallet has enough stake to run a validator on the subnet.
+
+    Args:
+        wallet (bt.wallet): The wallet to check.
+        metagraph (bt.metagraph): The metagraph containing network information.
+        required_stake (float): The minimum stake required to run a validator.
+
+    Raises:
+        ValueError: If the wallet does not have enough stake.
+    """
+    # Retrieve stake amount for the given wallet
+    uid = metagraph.hotkeys.index(wallet.hotkey.ss58_address)
+    current_stake = metagraph.S[uid]
+
+    if current_stake < required_stake:
+        raise ValueError(
+            f"Insufficient stake. You need at least {required_stake} stake to run a validator. Current stake: {current_stake}"
+        )
+
+    bt.logging.success(
+        f"Wallet {wallet.hotkey.ss58_address} has sufficient stake: {current_stake}"
+    )
+
+    return True
 
 
 def get_hash_of_two_strings(string1: str, string2: str) -> str:

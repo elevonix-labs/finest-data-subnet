@@ -74,6 +74,8 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
 
         logging.info(f"Validator {hotkey} is successfully registered with UID {uid}.")
 
+        utils.assert_sufficient_stake(wallet, metagraph)
+
         logging.info("Initiating the commit fetching process...")
 
         while True:
