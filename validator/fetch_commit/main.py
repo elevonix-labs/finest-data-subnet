@@ -158,6 +158,7 @@ def main():
 
         redis_queue = redis.Redis(host="localhost", port=6379, db=0)
         config = utils.get_config()
+        logging.info(config)
         fetch_commits(config, redis_queue)
 
     except KeyboardInterrupt:

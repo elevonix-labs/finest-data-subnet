@@ -26,65 +26,63 @@ def run_fetch_commits(args):
         args.wallet_hotkey,
         "--subtensor.network",
         args.subtensor_network,
-        "--subtensor.chain_endpoint",
-        args.subtensor_chain_endpoint,
     ]
+
+    if args.subtensor_chain_endpoint:
+        command.extend(["--subtensor.chain_endpoint", args.subtensor_chain_endpoint])
+
     subprocess.run(command, check=True, cwd="fetch_commit")
 
 
 def run_report_score(args):
-    subprocess.run(
-        [
-            ".venv/bin/python",
-            "report_score.py",
-            "--netuid",
-            args.netuid,
-            "--wallet.name",
-            args.wallet_name,
-            "--wallet.hotkey",
-            args.wallet_hotkey,
-            "--subtensor.network",
-            args.subtensor_network,
-            "--subtensor.chain_endpoint",
-            args.subtensor_chain_endpoint,
-        ],
-        check=True,
-        cwd="fetch_commit",
-    )
+    command = [
+        ".venv/bin/python",
+        "report_score.py",
+        "--netuid",
+        args.netuid,
+        "--wallet.name",
+        args.wallet_name,
+        "--wallet.hotkey",
+        args.wallet_hotkey,
+        "--subtensor.network",
+        args.subtensor_network,
+    ]
+
+    if args.subtensor_chain_endpoint:
+        command.extend(["--subtensor.chain_endpoint", args.subtensor_chain_endpoint])
+
+    subprocess.run(command, check=True, cwd="fetch_commit")
 
 
 def run_process_commits(args):
-    subprocess.run(
-        [
-            ".venv/bin/python",
-            "main.py",
-            "--world_size",
-            str(args.world_size),
-        ],
-        check=True,
-        cwd="process_commit",
-    )
+    command = [
+        ".venv/bin/python",
+        "main.py",
+        "--world_size",
+        str(args.world_size),
+    ]
+
+    subprocess.run(command, check=True, cwd="process_commit")
 
 
 def run_weight_setter(args):
-    subprocess.run(
-        [
-            ".venv/bin/python",
-            "weight_setter.py",
-            "--netuid",
-            args.netuid,
-            "--wallet.name",
-            args.wallet_name,
-            "--wallet.hotkey",
-            args.wallet_hotkey,
-            "--subtensor.network",
-            args.subtensor_network,
-            "--subtensor.chain_endpoint",
-            args.subtensor_chain_endpoint,
-        ],
-        check=True,
-        cwd="fetch_commit",
-    )
+    command = [
+        ".venv/bin/python",
+        "weight_setter.py",
+        "--netuid",
+        args.netuid,
+        "--wallet.name",
+        args.wallet_name,
+        "--wallet.hotkey",
+        args.wallet_hotkey,
+        "--subtensor.network",
+        args.subtensor_network,
+    ]
+
+    if args.subtensor_chain_endpoint:
+        command.extend(["--subtensor.chain_endpoint", args.subtensor_chain_endpoint])
+
+    subprocess.run(command, check=True, cwd="fetch_commit")
 
 
 def main():
