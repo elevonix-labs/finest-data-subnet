@@ -181,6 +181,8 @@ You can check more about it in [bittensor docs](https://docs.bittensor.com/worki
 
 ### 2. Running the Script
 
+#### Without auto-updates
+
 You can run the script using the following command:
 
 - Mainnet
@@ -228,6 +230,29 @@ Or run with pm2
 ```bash
 pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_name test-validator --wallet_hotkey h1 --subtensor_chain_endpoint ws://localhost:9946 --world_size 1
 ```
+
+
+#### With auto-updates
+
+1. For running with auto-updates, you should run it in project root directory, now you are in `validator` directory, so can run this command `cd ..`
+2. Make sure you're using the main branch: `git checkout main.`
+
+- Mainnet
+```bash
+pm2 start --name net63-vali-updater --interpreter python3 scripts/start_validator.py -- --pm2_name net63-vali --wallet_name validator --wallet_hotkey h1 --world_size 1
+```
+
+- Testnet
+```bash
+pm2 start --name net63-vali-updater --interpreter python3 scripts/start_validator.py -- --pm2_name net63-vali --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
+```
+
+- Custom
+```bash
+pm2 start --name net63-vali-updater --interpreter python3 scripts/start_validator.py -- --pm2_name net63-vali --wallet_name test-validator --wallet_hotkey h1 --subtensor_chain_endpoint ws://localhost:9946 --world_size 1
+```
+
+
 
 
 **Explanation of the arguments:**
