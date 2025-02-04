@@ -4,6 +4,7 @@ from multiprocessing import Process
 from dotenv import load_dotenv
 import psutil
 
+
 def terminate_process(process):
     if process.is_alive():
         try:
@@ -12,16 +13,24 @@ def terminate_process(process):
             for child in children:
                 child.terminate()
             process.terminate()
-            process.join(timeout=15)  
-            
+            process.join(timeout=15)
+
             for child in children:
                 if child.is_running():
                     child.kill()
-            
+
             if process.is_alive():
                 process.kill()
         except psutil.NoSuchProcess:
             print(f"Process {process.pid} no longer exists.")
+
+        print(f"✅ {process.name} (PID: {process.pid}) terminated successfully.")
+
+
+def terminate_processes(processes):
+    for process in processes:
+        terminate_process(process)
+
 
 def run_fetch_commits(args):
     command = [
@@ -143,8 +152,6 @@ def main():
 
         args = parser.parse_args()
 
-        # Verify validity of the validator
-
         # Initialize process objects
         fetch_process = Process(target=run_fetch_commits, args=(args,), daemon=True)
         process_process = Process(target=run_process_commits, args=(args,), daemon=True)
@@ -166,24 +173,31 @@ def main():
         for process in processes:
             process.start()
 
-        # Await process completion
-        for process in processes:
-            process.join()
+        # # Monitor processes
+        while True:
+            for process in processes:
+                if not process.is_alive():
+                    print(
+                        f"❌ {process.name} (PID: {process.pid}) terminated unexpectedly.\n🙊 Terminating other processes..."
+                    )
+                    terminate_processes(processes)
+                    return
 
-            if process.exitcode != 0:
-                raise RuntimeError(f"Process {process.name} failed with exit code {process.exitcode}")
+            if process.exitcode:
+                raise RuntimeError(
+                    f"Process {process.name} (PID: {process.pid}) failed with exit code {process.exitcode}"
+                )
 
-    except (KeyboardInterrupt, RuntimeError) as e:
-        print(f"\n❌ An error occurred: {e}")
-        for process in processes:
-            terminate_process(process)
-        print("✅ All subprocesses terminated due to an error.")
-
+    except KeyboardInterrupt as e:
+        print("🔴 Main process interrupted by user.")
+    except RuntimeError as e:
+        print("🔴 All subprocesses terminated due to an error.")
     finally:
-        for process in processes:
-            terminate_process(process)
+        terminate_processes(processes)
+
+
 if __name__ == "__main__":
 
     load_dotenv()
-    
+
     main()

@@ -97,11 +97,13 @@ def main(config: bt.config, subtensor: bt.subtensor):
                 logging.error(f"An error occurred in the main loop: {e}", exc_info=True)
 
     except KeyboardInterrupt:
-        print("\n🔴Weight setter Process interrupted by user.")
-        
+        print("🔴 Weight-setter Process interrupted by user.")
+
     except Exception as e:
         print(f"{e}")
         sys.exit(1)
+
+
 if __name__ == "__main__":
 
     logging.info("Initializing the process...")

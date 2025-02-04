@@ -54,7 +54,7 @@ def assert_registered(wallet: bt.wallet, metagraph: bt.metagraph):
 
 def assert_sufficient_stake(
     wallet: bt.wallet, metagraph: bt.metagraph, required_stake: float = 4096
-) -> bool:
+):
     """Asserts the wallet has enough stake to run a validator on the subnet.
 
     Args:
@@ -78,7 +78,7 @@ def assert_sufficient_stake(
         f"Wallet {wallet.hotkey.ss58_address} has sufficient stake: {current_stake}"
     )
 
-    return True
+    return current_stake, required_stake, uid
 
 
 def get_hash_of_two_strings(string1: str, string2: str) -> str:
