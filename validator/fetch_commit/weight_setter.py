@@ -2,6 +2,7 @@ import bittensor as bt
 import numpy as np
 import utils
 import redis
+import sys
 import time
 from utils import process_weights_for_netuid, convert_weights_and_uids_for_emit
 import logging
@@ -62,7 +63,7 @@ def set_weights(
         )
 
         if result:
-            logging.info("set_weights on chain successfully!")
+            logging.info("🚀 set_weights on chain successfully!")
         else:
             logging.error(f"set_weights failed: {msg}")
 
@@ -75,7 +76,7 @@ def main(config: bt.config, subtensor: bt.subtensor):
 
     logging.info("Started main loop to periodically set weights.")
 
-    try :
+    try:
         while True:
             try:
                 if subtensor.get_current_block() % 100 == 0:
@@ -96,7 +97,12 @@ def main(config: bt.config, subtensor: bt.subtensor):
                 logging.error(f"An error occurred in the main loop: {e}", exc_info=True)
 
     except KeyboardInterrupt:
-        print("\n🔴Weight setter Process interrupted by user.")
+        print("🔴 Weight-setter Process interrupted by user.")
+
+    except Exception as e:
+        print(f"{e}")
+        sys.exit(1)
+
 
 if __name__ == "__main__":
 

@@ -1,6 +1,5 @@
-import os
-import sys
 import time
+import sys
 import logging
 from typing import Any, cast
 import bittensor as bt
@@ -72,9 +71,25 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
         metagraph: bt.metagraph = subtensor.metagraph(config.netuid)
 
         # Ensure the wallet is registered
-        hotkey, uid = utils.assert_registered(wallet, metagraph)
+        try:
+            hotkey, uid = utils.assert_registered(wallet, metagraph)
+            logging.info(f"Hotkey {hotkey} is registered with UID {uid}.")
+        except ValueError as e:
+            logging.error(
+                f"Hotkey {wallet.hotkey.ss58_address} is not registered on subnet {config.netuid}."
+            )
+            return
 
-        logging.info(f"Validator {hotkey} is successfully registered with UID {uid}.")
+        try:
+            utils.assert_sufficient_stake(wallet, metagraph)
+            logging.info(
+                f"Validator (uid: {uid}) has sufficient stake to set weights on the subnet."
+            )
+        except ValueError as e:
+            logging.error(
+                f"Hotkey ({wallet.hotkey.ss58_address}) (uid: {uid}) does not have sufficient stake to set weights on the subnet."
+            )
+            return
 
         logging.info("Initiating the commit fetching process...")
 
@@ -151,17 +166,20 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
             exc_info=True,
         )
 
+        sys.exit(1)
+
 
 def main():
 
     try:
-
         redis_queue = redis.Redis(host="localhost", port=6379, db=0)
         config = utils.get_config()
+        logging.info(config)
         fetch_commits(config, redis_queue)
 
     except KeyboardInterrupt:
-        print("\n🔴Fetch commit Process interrupted by user")
+        print("🔴 Fetch-commit Process interrupted by user")
+
 
 if __name__ == "__main__":
 

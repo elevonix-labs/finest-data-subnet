@@ -192,7 +192,7 @@ def main():
         process_commits(redis_queue, world_size)
 
     except KeyboardInterrupt:
-        print("\n🔴Processing commit Process interrupted by user.")
+        print("🔴 Process-commit Process interrupted by user.")
 
 if __name__ == "__main__":
 

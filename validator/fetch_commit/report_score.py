@@ -93,13 +93,15 @@ def report_score(config: bt.config, redis_queue: redis.Redis):
             )
             time.sleep(10)
 
+
 def main():
     try:
         redis_queue = redis.Redis(host="localhost", port=6379, db=0)
         config = utils.get_config()
         report_score(config, redis_queue)
     except KeyboardInterrupt:
-        print("\n🔴Report score Process interrupted by user")
+        print("🔴 Report-score Process interrupted by user")
+
 
 if __name__ == "__main__":
 
