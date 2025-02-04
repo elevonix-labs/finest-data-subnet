@@ -1,4 +1,5 @@
 import time
+import sys
 import logging
 from typing import Any, cast
 import bittensor as bt
@@ -150,7 +151,8 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
             f"Unable to fetch commits at this time. Please verify the configuration and try again. Error: {e}",
             exc_info=True,
         )
-
+        
+        sys.exit(1)
 
 def main():
 

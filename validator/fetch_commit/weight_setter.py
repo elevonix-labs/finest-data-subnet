@@ -2,6 +2,7 @@ import bittensor as bt
 import numpy as np
 import utils
 import redis
+import sys
 import time
 from utils import process_weights_for_netuid, convert_weights_and_uids_for_emit
 import logging
@@ -97,8 +98,10 @@ def main(config: bt.config, subtensor: bt.subtensor):
 
     except KeyboardInterrupt:
         print("\n🔴Weight setter Process interrupted by user.")
-
-
+        
+    except Exception as e:
+        print(f"{e}")
+        sys.exit(1)
 if __name__ == "__main__":
 
     logging.info("Initializing the process...")

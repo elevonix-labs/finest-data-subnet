@@ -2,17 +2,26 @@ import subprocess
 import argparse
 from multiprocessing import Process
 from dotenv import load_dotenv
+import psutil
 
-
-# Handle termination signals gracefully
-def terminate_processes(processes):
-    for process in processes:
-        if process.is_alive():
+def terminate_process(process):
+    if process.is_alive():
+        try:
+            parent = psutil.Process(process.pid)
+            children = parent.children(recursive=True)
+            for child in children:
+                child.terminate()
             process.terminate()
-            process.join(timeout=5)  # Allow some time for a clean exit
+            process.join(timeout=15)  
+            
+            for child in children:
+                if child.is_running():
+                    child.kill()
+            
             if process.is_alive():
-                process.kill()  # Forcefully terminate if still running
-
+                process.kill()
+        except psutil.NoSuchProcess:
+            print(f"Process {process.pid} no longer exists.")
 
 def run_fetch_commits(args):
     command = [
@@ -31,7 +40,11 @@ def run_fetch_commits(args):
     if args.subtensor_chain_endpoint:
         command.extend(["--subtensor.chain_endpoint", args.subtensor_chain_endpoint])
 
-    subprocess.run(command, check=True, cwd="fetch_commit")
+    try:
+        subprocess.run(command, check=True, cwd="fetch_commit")
+    except subprocess.CalledProcessError as e:
+        print(f"Error in fetch_commits: {e}")
+        raise
 
 
 def run_report_score(args):
@@ -51,7 +64,11 @@ def run_report_score(args):
     if args.subtensor_chain_endpoint:
         command.extend(["--subtensor.chain_endpoint", args.subtensor_chain_endpoint])
 
-    subprocess.run(command, check=True, cwd="fetch_commit")
+    try:
+        subprocess.run(command, check=True, cwd="fetch_commit")
+    except subprocess.CalledProcessError as e:
+        print(f"Error in report_score: {e}")
+        raise
 
 
 def run_process_commits(args):
@@ -82,11 +99,17 @@ def run_weight_setter(args):
     if args.subtensor_chain_endpoint:
         command.extend(["--subtensor.chain_endpoint", args.subtensor_chain_endpoint])
 
-    subprocess.run(command, check=True, cwd="fetch_commit")
+    try:
+        subprocess.run(command, check=True, cwd="fetch_commit")
+    except subprocess.CalledProcessError as e:
+        print(f"Error in weight_setter: {e}")
+        raise
 
 
 def main():
+    processes = []
     try:
+
         parser = argparse.ArgumentParser(
             description="Execute validator code with the provided arguments."
         )
@@ -147,19 +170,20 @@ def main():
         for process in processes:
             process.join()
 
-    except KeyboardInterrupt:
-        terminate_processes(processes)
-        print("✅ All subprocesses terminated safely.")
+            if process.exitcode != 0:
+                raise RuntimeError(f"Process {process.name} failed with exit code {process.exitcode}")
 
-    except Exception as e:
+    except (KeyboardInterrupt, RuntimeError) as e:
         print(f"\n❌ An error occurred: {e}")
-        terminate_processes(processes)
+        for process in processes:
+            terminate_process(process)
         print("✅ All subprocesses terminated due to an error.")
 
     finally:
-        terminate_processes(processes)
-
-
+        for process in processes:
+            terminate_process(process)
 if __name__ == "__main__":
+
     load_dotenv()
+    
     main()
