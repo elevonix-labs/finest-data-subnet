@@ -181,6 +181,8 @@ You can check more about it in [bittensor docs](https://docs.bittensor.com/worki
 
 ### 2. Running the Script
 
+#### Without auto-updates
+
 You can run the script using the following command:
 
 - Mainnet
@@ -200,7 +202,7 @@ pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_na
 
 - Testnet
 ```bash
-poetry run python main.py --netuid <netuid> --subtensor.network test --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count]
+poetry run python main.py --netuid <netuid> --subtensor_network test --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count]
 ```
 
 Example
@@ -212,6 +214,46 @@ Or run with pm2
 ```bash
 pm2 start main.py --name test-validator --interpreter .venv/bin/python -- --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
 ```
+
+
+- Custom
+```bash
+poetry run python main.py --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey --subtensor_chain_endpoint address [--world_size gpu_count]
+```
+
+Example
+
+```bash
+poetry run python main.py --wallet_name test-validator --wallet_hotkey h1 --subtensor_chain_endpoint ws://localhost:9946 --world_size 1
+```
+Or run with pm2
+```bash
+pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_name test-validator --wallet_hotkey h1 --subtensor_chain_endpoint ws://localhost:9946 --world_size 1
+```
+
+
+#### With auto-updates
+
+1. For running with auto-updates, you should run it in project root directory, now you are in `validator` directory, so can run this command `cd ..`
+2. Make sure you're using the main branch: `git checkout main.`
+
+- Mainnet
+```bash
+pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --wallet_name validator --wallet_hotkey h1 --world_size 1
+```
+
+- Testnet
+```bash
+pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
+```
+
+- Custom
+```bash
+pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --wallet_name test-validator --wallet_hotkey h1 --subtensor_chain_endpoint ws://localhost:9946 --world_size 1
+```
+
+
+
 
 **Explanation of the arguments:**
 - **--netuid**, **--wallet_name**, **--wallet_hotkey**, **--subtensor_network**: These arguments are used to specify the wallet name, hotkey, subtensor network of bittensor network. Plz check (bittensor docs)[https://docs.bittensor.com/] for more details.
