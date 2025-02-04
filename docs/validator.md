@@ -239,17 +239,17 @@ pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_na
 
 - Mainnet
 ```bash
-pm2 start --name net63-vali-updater --interpreter python3 scripts/start_validator.py -- --pm2_name net63-vali --wallet_name validator --wallet_hotkey h1 --world_size 1
+pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --wallet_name validator --wallet_hotkey h1 --world_size 1
 ```
 
 - Testnet
 ```bash
-pm2 start --name net63-vali-updater --interpreter python3 scripts/start_validator.py -- --pm2_name net63-vali --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
+pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
 ```
 
 - Custom
 ```bash
-pm2 start --name net63-vali-updater --interpreter python3 scripts/start_validator.py -- --pm2_name net63-vali --wallet_name test-validator --wallet_hotkey h1 --subtensor_chain_endpoint ws://localhost:9946 --world_size 1
+pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --wallet_name test-validator --wallet_hotkey h1 --subtensor_chain_endpoint ws://localhost:9946 --world_size 1
 ```
 
 

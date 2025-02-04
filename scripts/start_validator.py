@@ -1,9 +1,8 @@
-
 """
 This script runs a validator process and automatically updates it when a new version is released.
 Command-line arguments will be forwarded to validator (`neurons/validator.py`), so you can pass
 them like this:
-    python3 scripts/start_validator.py --wallet.name=my-wallet
+    python3 scripts/start_validator.py --wallet_name=my-wallet
 Auto-updates are enabled by default and will make sure that the latest version is always running
 by pulling the latest version from git and upgrading python packages. This is done periodically.
 Local changes may prevent the update, but they will be preserved.
@@ -11,9 +10,10 @@ Local changes may prevent the update, but they will be preserved.
 The script will use the same virtual environment as the one used to run it. If you want to run
 validator within virtual environment, run this auto-update script from the virtual environment.
 
-Pm2 is required for this script. This script will start a pm2 process using the name provided by
+PM2 is required for this script. This script will start a pm2 process using the name provided by
 the --pm2_name argument.
 """
+
 import os
 import argparse
 import logging
@@ -25,7 +25,7 @@ from shlex import split
 from typing import List
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-root_dir = os.path.abspath(os.path.join(current_dir, '..'))
+root_dir = os.path.abspath(os.path.join(current_dir, ".."))
 
 log = logging.getLogger(__name__)
 UPDATES_CHECK_TIME = timedelta(minutes=15)
@@ -47,7 +47,7 @@ def get_version() -> str:
 def start_validator_process(pm2_name: str, args: List[str]) -> subprocess.Popen:
     """
     Spawn a new python process running neurons.validator.
-    `sys.executable` ensures thet the same python interpreter is used as the one
+    `sys.executable` ensures that the same python interpreter is used as the one
     used to run this auto-updater.
     """
 
@@ -64,7 +64,7 @@ def start_validator_process(pm2_name: str, args: List[str]) -> subprocess.Popen:
             "--",
             *args,
         ),
-        cwd=os.path.join(root_dir, 'validator'),
+        cwd=os.path.join(root_dir, "validator"),
     )
     process.pm2_name = pm2_name
 
@@ -73,9 +73,8 @@ def start_validator_process(pm2_name: str, args: List[str]) -> subprocess.Popen:
 
 def stop_validator_process(process: subprocess.Popen) -> None:
     """Stop the validator process"""
-    subprocess.run(
-        ("pm2", "delete", process.pm2_name), cwd=root_dir, check=True
-    )
+    subprocess.run(("pm2", "delete", process.pm2_name), cwd=root_dir, check=True)
+
 
 def pull_latest_version() -> None:
     """
@@ -88,12 +87,11 @@ def pull_latest_version() -> None:
     to be used as-is.
     """
     try:
-        subprocess.run(
-            split("git pull --rebase --autostash"), check=True, cwd=root_dir
-        )
+        subprocess.run(split("git pull --rebase --autostash"), check=True, cwd=root_dir)
     except subprocess.CalledProcessError as exc:
         log.error("Failed to pull, reverting: %s", exc)
         subprocess.run(split("git rebase --abort"), check=True, cwd=root_dir)
+
 
 def upgrade_packages() -> None:
     """
@@ -105,10 +103,11 @@ def upgrade_packages() -> None:
         subprocess.run(
             split("./setup_environments.sh"),
             check=True,
-            cwd=os.path.join(root_dir, 'validator'),
+            cwd=os.path.join(root_dir, "validator"),
         )
     except subprocess.CalledProcessError as exc:
         log.error("Failed to run setup_environment.sh, proceeding anyway. %s", exc)
+
 
 def main(pm2_name: str, args: List[str]) -> None:
     """
@@ -133,7 +132,7 @@ def main(pm2_name: str, args: List[str]) -> None:
                     latest_version,
                 )
                 upgrade_packages()
-          
+
                 stop_validator_process(validator)
                 validator = start_validator_process(pm2_name, args)
                 current_version = latest_version
@@ -153,11 +152,11 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="Automatically update and restart the validator process when a new version is released.",
-        epilog="Example usage: python start_validator.py --pm2_name 'net9vali' --wallet_name 'wallet1' --wallet_hotkey 'key123'",
+        epilog="Example usage: python start_validator.py --pm2_name 'sn63-validator' --wallet_name 'validator' --wallet_hotkey 'default'",
     )
 
     parser.add_argument(
-        "--pm2_name", default="net63vali", help="Name of the PM2 process."
+        "--pm2_name", default="sn63-validator", help="Name of the PM2 process."
     )
 
     flags, extra_args = parser.parse_known_args()
