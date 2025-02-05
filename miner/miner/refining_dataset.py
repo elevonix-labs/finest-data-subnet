@@ -195,7 +195,6 @@ class DataRefiner:
             return False
 
         warc_files_path = self._create_warc_files_path()
-        print(warc_files_path)
         main_processing_executor = self._create_main_processing_executor(
             warc_files_path
         )
