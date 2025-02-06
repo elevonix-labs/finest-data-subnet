@@ -34,6 +34,7 @@ init(autoreset=True)
 # Custom logging formatter to add colors and emojis
 class ColoredFormatter(logging.Formatter):
     COLORS = {
+        "CRITICAL":Fore.BLUE,
         "INFO": Fore.GREEN,
         "WARNING": Fore.YELLOW,
         "ERROR": Fore.RED,
@@ -70,7 +71,7 @@ logger.handlers[0] = console_handler
 try:
     nltk.data.find("tokenizers/punkt")
 except LookupError:
-    print("Downloading 'punkt' package...")
+    logging.log("Downloading 'punkt' package...")
     nltk.download("punkt")
 
 
@@ -114,123 +115,128 @@ def get_config() -> bt.config:
 
 def remove_result_folder(folder_path):
     shutil.rmtree(folder_path)
-    logging.info(f"Folder '{folder_path}' removed successfully.")
+    logging.critical(f"Folder '{folder_path}' removed successfully.")
 
 
-async def main(config):
+async def processing(config):
     """
     Main function to commit dataset to Bittensor subtensor chain.
 
     Args:
         config (bt.Config): Configuration object.
     """
-    try:
-        print(f"bittensor version: {bt.__version__}")
+    logger.info(f"bittensor version: {bt.__version__}")
 
-        while True:  # Infinite loop to keep the script running continuously
-            start = time.time()
-            # Initialize logging
-            bt.logging(config=config)
-            # Initialize wallet and subtensor
-            wallet = bt.wallet(config=config)
-            subtensor = bt.subtensor(config=config)
-            timestamp = datetime.now()
-            timezone = timestamp.astimezone().tzname()
+    while True:  # Infinite loop to keep the script running continuously
 
-            message = f"{timestamp}{timezone}"
-            signature = generate_signature(wallet, message)
-            # Retrieve the metagraph
-            metagraph: bt.metagraph = subtensor.metagraph(config.netuid)
+        start = time.time()
+        bt.logging(config=config)
+        wallet = bt.wallet(config=config)
+        subtensor = bt.subtensor(config=config)
+        timestamp = datetime.now()
+        timezone = timestamp.astimezone().tzname()
 
-            # Ensure the wallet is registered
-            hotkey, uid = assert_registered(wallet, metagraph)
-            logging.info(f"Miner: {hotkey} is registered with uid: {uid}")
-            warc_files = fetch_warc_files(hotkey, message, signature)
-            logging.info(f"Received {len(warc_files)} warc files")
+        message = f"{timestamp}{timezone}"
+        signature = generate_signature(wallet, message)
+        metagraph: bt.metagraph = subtensor.metagraph(config.netuid)
+        hotkey, uid = assert_registered(wallet, metagraph)
+        if not hotkey:
+            logger.error(f"You are not registered. \nUse: \n`btcli s register --netuid {metagraph.netuid}` to register via burn \n or btcli s pow_register --netuid {metagraph.netuid} to register with a proof of work")
+            return
+        logger.info( f"You are registered with address: {wallet.hotkey.ss58_address} and uid: {uid}")
+        
+        warc_files = fetch_warc_files(hotkey, message, signature)
+        logger.info(f"Received {len(warc_files)} warc files")
 
-            if not warc_files:
-                logging.warning(
-                    "WARC files not found, waiting for 2 hours before retrying..."
-                )
-                await asyncio.sleep(2 * 3600)
-                continue
-
-            result_path = f"./result"
-            # # Remove result path if it already exists
-            if os.path.exists(result_path):
-                logging.warning(f"Removing result folder {result_path}")
-                remove_result_folder(result_path)
-
-            logging.info(f"Refining {len(warc_files)} warc files 📚")
-            refiner = DataRefiner(
-                warc_files,
-                result_path,
-                config.total_tasks,
-                config.cpus_per_task,
-                config.limit,
+        if not warc_files:
+            logger.warning(
+                "WARC files not found, waiting for 2 hours before retrying..."
             )
-            processing_success = refiner.refine()
+            await asyncio.sleep(2 * 3600)
+            continue
 
-            if processing_success:
-                logging.info("Data processing completed successfully 🎉")
+        result_path = f"./result"
+        if os.path.exists(result_path):
+            logger.warning(f"Removing result folder {result_path}")
+            remove_result_folder(result_path)
 
-                hf_repo_id = upload_dataset(result_path, config.hf_repo)
+        logger.info(f"Refining {len(warc_files)} warc files 📚")
+        refiner = DataRefiner(
+            warc_files,
+            result_path,
+            config.total_tasks,
+            config.cpus_per_task,
+            config.limit,
+        )
+        processing_success = refiner.refine()
 
-                if hf_repo_id:
-                    while True:
-                        try:
-                            logging.info(
-                                f"Committing dataset to subtensor chain {hf_repo_id}"
-                            )
-                            subtensor.commit(wallet, config.netuid, f"{hf_repo_id}")
-                            logging.info(
-                                "🎉 Successfully committed dataset to subtensor chain 🎉"
-                            )
+        if processing_success:
+            logger.info("Data processing completed successfully 🎉")
+
+            hf_repo_id = upload_dataset(result_path, config.hf_repo)
+
+            if hf_repo_id:
+                while True:
+                    try:
+                        logger.info(
+                            f"Committing dataset to subtensor chain {hf_repo_id}"
+                        )
+                        subtensor.commit(wallet, config.netuid, f"{hf_repo_id}")
+                        logger.info(
+                            "🎉 Successfully committed dataset to subtensor chain 🎉"
+                        )
+                        break
+                    except Exception as e:
+                        import traceback
+
+                        traceback.print_exc()
+                        logger.error(
+                            f"Can't commit to subtensor chain now, retrying in 300 seconds..{e}"
+                        )
+                        await asyncio.sleep(300)
+
+                max_retries = 10
+                retry_count = 0
+
+                while retry_count < max_retries:
+                    try:
+                        logger.info(
+                            f"Sending finish request for hotkey {hotkey} 📤"
+                        )
+                        message = f"{timestamp}{timezone}"
+                        signature = generate_signature(wallet, message)
+                        response = send_finish_request(
+                            hotkey, message, signature, f"{hf_repo_id}"
+                        )
+                        if response:
                             break
-                        except Exception as e:
-                            import traceback
+                    except Exception as e:
+                        logger.error(
+                            f"Can't send finish request now, trying again in 20 seconds {e}"
+                        )
+                        await asyncio.sleep(20)
+                        retry_count += 1
+        end = time.time() - start
+        logger.info(f"Processing time: {end:.2f} seconds 🕒")
+        
+        logger.error("Waiting for 8 hours before starting next task again 🕒")
+        try:
+            await asyncio.wait_for(asyncio.sleep(8 * 3600), timeout=8 * 3600)
+        except asyncio.TimeoutError:
+            pass 
 
-                            traceback.print_exc()
-                            logging.warning(
-                                f"Can't commit to subtensor chain now, retrying in 300 seconds..{e}"
-                            )
-                            await asyncio.sleep(300)
+def main():
+    try:
+        config = get_config()
+        logger.info("Initiating the mining process 🚀")
+        asyncio.run(processing(config))
 
-                    max_retries = 10
-                    retry_count = 0
-
-                    while retry_count < max_retries:
-                        try:
-                            logging.info(
-                                f"Sending finish request for hotkey {hotkey} 📤"
-                            )
-                            message = f"{timestamp}{timezone}"
-                            signature = generate_signature(wallet, message)
-                            response = send_finish_request(
-                                hotkey, message, signature, f"{hf_repo_id}"
-                            )
-                            if response:
-                                break
-                        except Exception as e:
-                            logging.warning(
-                                f"Can't send finish request now, trying again in 20 seconds {e}"
-                            )
-                            await asyncio.sleep(20)
-                            retry_count += 1
-            end = time.time() - start
-            logging.info(f"Processing time: {end:.2f} seconds 🕒")
-
-            await asyncio.sleep(8 * 3600)
     except KeyboardInterrupt:
-        print("Process interrupted by user.")
+        logger.error("🔴 Mining process interrupted by user.")
 
 
 if __name__ == "__main__":
 
     load_dotenv()
 
-    config = get_config()
-
-    logging.info("Initiating the mining process 🚀")
-
-    asyncio.run(main(config))
+    main()

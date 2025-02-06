@@ -96,7 +96,7 @@ sudo service slurmdbd status
 ```
 
 Refer to this image for more details.
-![Slurmdbd Status](./docs/slurmdbd_status.png)
+![Slurmdbd Status](./slurmdbd_status.png)
 
 #### Install SLURM and configuration
 
