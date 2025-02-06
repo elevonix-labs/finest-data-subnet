@@ -16,10 +16,10 @@ def check_similarity(sample_similarities):
 
 
 def calculate_data_quality(value, stderr):
-    return value / (stderr + 1)
+    return value * (1 - stderr)
 
 
-def calculate_score(time_elapsed, value, stderr, sample_similarities, x=0.5):
+def calculate_score(time_elapsed, value, stderr, sample_similarities, x=0.7):
     """
     Calculate a score based on time elapsed, value, and sample similarities.
     """
@@ -27,8 +27,19 @@ def calculate_score(time_elapsed, value, stderr, sample_similarities, x=0.5):
     # Verify if 70% of sample similarities exceed 70
     if check_similarity(sample_similarities) == 0:
         return 0
+
     data_quality = calculate_data_quality(value, stderr)
 
-    score = (time_elapsed * x) + (data_quality * (1 - x))
+    print(f"Value: {value}")
+    print(f"Stderr: {stderr}")
+    print(f"Data quality: {data_quality}")
+    print(f"Time elapsed: {time_elapsed}")
+
+    T_MAX = 3600 * 24  # 1 day in seconds
+
+    time_elapsed = min(time_elapsed, T_MAX)
+    time_elapsed = max(time_elapsed, 0)
+
+    score = x * data_quality + (1 - x) * (1 - time_elapsed / T_MAX)
 
     return score

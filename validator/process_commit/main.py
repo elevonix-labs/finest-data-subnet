@@ -171,8 +171,8 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
                         report_data = {"task_id": task_id, "score": score}
                         logging.info(f"Previous Score: {current_score}")
                         logging.info(f"New Score: {score}")
-                        logging.info(f"Calculated score for UID {uid}: {score}")
                         updated_score = current_score * 0.8 + score * 0.2
+                        logging.info(f"Calculated score for UID {uid}: {updated_score}")
                         redis_queue.rpush("report_score", json.dumps(report_data))
                         redis_queue.hset("scores", int(uid), json.dumps(updated_score))
                 logging.info(f"Total time taken: {time.time() - start_time}")
@@ -194,7 +194,7 @@ def main():
     except KeyboardInterrupt:
         print("🔴 Process-commit Process interrupted by user.")
 
+
 if __name__ == "__main__":
 
     main()
-
