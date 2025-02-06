@@ -37,6 +37,9 @@ def calculate_score(time_elapsed, value, stderr, sample_similarities, x=0.7):
 
     T_MAX = 3600 * 24  # 1 day in seconds
 
+    time_elapsed = min(time_elapsed, T_MAX)
+    time_elapsed = max(time_elapsed, 0)
+
     score = x * data_quality + (1 - x) * (1 - time_elapsed / T_MAX)
 
     return score
