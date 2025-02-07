@@ -107,7 +107,6 @@ class DataRefiner:
 
     def _create_deduplication_stages(self, main_processing_executor):
         input_reader = JsonlReader(f"{self.filtering_output_path}/output")
-
         stage1 = SlurmPipelineExecutor(
             job_name="mh1_warc",
             pipeline=[
@@ -193,26 +192,29 @@ class DataRefiner:
         if not self.warc_files:
             print("No WARC files fetched from API. Exiting.")
             return False
+        try :
 
-        warc_files_path = self._create_warc_files_path()
-        main_processing_executor = self._create_main_processing_executor(
-            warc_files_path
-        )
-        stage4 = self._create_deduplication_stages(main_processing_executor)
+            warc_files_path = self._create_warc_files_path()
+            main_processing_executor = self._create_main_processing_executor(
+                warc_files_path
+            )
+            stage4 = self._create_deduplication_stages(main_processing_executor)
 
-        # Launch deduplication pipeline
-        stage4.run()
-        final_status = wait_for_job_completion(stage4.job_id)
+            stage4.run()
 
-        if final_status == "COMPLETED":
-            return True
-        elif final_status == "FAILED":
-            print("Job failed, aborting post-processing.")
+            final_status = wait_for_job_completion(stage4.job_id)
+
+            if final_status == "COMPLETED":
+                return True
+            elif final_status == "FAILED":
+
+                print("Job failed, aborting post-processing.")
+                return False
+            else:
+                print("Unhandled job status:", final_status)
+                return False
+        except Exception as e:
             return False
-        else:
-            print("Unhandled job status:", final_status)
-            return False
-
 
 if __name__ == "__main__":
     warc_files = [
@@ -227,3 +229,4 @@ if __name__ == "__main__":
     limit = 10
     refiner = DataRefiner(warc_files, result_path, total_tasks, cpus_per_task, limit)
     refiner.refine()
+
