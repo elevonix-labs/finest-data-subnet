@@ -71,7 +71,7 @@ logger.handlers[0] = console_handler
 try:
     nltk.data.find("tokenizers/punkt")
 except LookupError:
-    logging.log("Downloading 'punkt' package...")
+    logger.info("Downloading 'punkt' package...")
     nltk.download("punkt")
 
 
