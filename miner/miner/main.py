@@ -71,7 +71,7 @@ logger.handlers[0] = console_handler
 try:
     nltk.data.find("tokenizers/punkt")
 except LookupError:
-    logging.log("Downloading 'punkt' package...")
+    logger.info("Downloading 'punkt' package...")
     nltk.download("punkt")
 
 
@@ -144,8 +144,8 @@ async def processing(config):
             logger.error(f"You are not registered. \nUse: \n`btcli s register --netuid {metagraph.netuid}` to register via burn \n or btcli s pow_register --netuid {metagraph.netuid} to register with a proof of work")
             return
         logger.info( f"You are registered with address: {wallet.hotkey.ss58_address} and uid: {uid}")
-        
         warc_files = fetch_warc_files(hotkey, message, signature)
+       
         logger.info(f"Received {len(warc_files)} warc files")
 
         if not warc_files:
@@ -216,6 +216,11 @@ async def processing(config):
                         )
                         await asyncio.sleep(20)
                         retry_count += 1
+
+        else:
+            logger.error("The data processing failed due to a misconfiguration in the Slurm setup. Please review the Slurm configuration settings to resolve the issue")
+            return
+        
         end = time.time() - start
         logger.info(f"Processing time: {end:.2f} seconds 🕒")
         
