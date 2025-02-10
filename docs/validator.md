@@ -250,8 +250,9 @@ pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_na
 
 #### With auto-updates
 
-1. For running with auto-updates, you should run it in project root directory, now you are in `validator` directory, so can run this command `cd ..`
-2. Make sure you're using the main branch: `git checkout main.`
+1. To enable auto-updates, ensure you are in the project root directory. If you are currently in the `validator` directory, execute `cd ..` to navigate to the root.
+2. Verify that you are on the main branch by running: `git checkout main`.
+3. Ensure your Git credentials are configured correctly, as they are required to execute Git commands necessary for the auto-update process.
 
 - Mainnet
 
