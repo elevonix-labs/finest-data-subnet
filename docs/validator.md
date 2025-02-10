@@ -71,7 +71,7 @@ poetry --version
 ### Installing PM2 (optional)
 
 ```bash
-sudo apt install nodejs && npm
+sudo apt install nodejs npm
 npm install -g pm2@latest
 ```
 
@@ -93,7 +93,6 @@ region = us-west-1
 output = json
 ```
 
-
 ~/.aws/credentials
 
 ```bash
@@ -101,6 +100,7 @@ output = json
 aws_access_key_id = YOUR_ACCESS_KEY_ID
 aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
 ```
+
 Or you can add it in .env file
 Plz check .env.sample file for more details.
 
@@ -136,7 +136,8 @@ cd validator
 
 ```
 
-### Running  Redis
+### Running Redis
+
 We should have redis running on the machine.
 
 If you didn't install sudo, install it first.
@@ -154,16 +155,17 @@ sudo apt install redis-server
 sudo service redis-server start
 
 ```
+
 Check if redis is running
 
 ```bash
 redis-cli ping
 ```
 
-
 ## Running Validator
 
 ### 1. Creating Bittensor wallet.
+
 Make sure you have the necessary environment setup. You should have a Bittensor wallet and access to the Bittensor subtensor chain.
 
 You can active poetry venv for creating wallet.
@@ -186,7 +188,6 @@ For example,
 
 You can check more about it in [bittensor docs](https://docs.bittensor.com/working-with-keys)
 
-
 ### 2. Running the Script
 
 #### Without auto-updates
@@ -194,6 +195,7 @@ You can check more about it in [bittensor docs](https://docs.bittensor.com/worki
 You can run the script using the following command:
 
 - Mainnet
+
 ```bash
 poetry run python main.py --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count]
 ```
@@ -203,12 +205,15 @@ Example
 ```bash
 poetry run python main.py --wallet_name validator --wallet_hotkey default --world_size 1
 ```
+
 Or run with pm2
+
 ```bash
 pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_name validator --wallet_hotkey default --world_size 1
 ```
 
 - Testnet
+
 ```bash
 poetry run python main.py --netuid <netuid> --subtensor_network test --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count]
 ```
@@ -218,13 +223,15 @@ Example
 ```bash
 poetry run python main.py --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
 ```
+
 Or run with pm2
+
 ```bash
 pm2 start main.py --name test-validator --interpreter .venv/bin/python -- --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
 ```
 
+- Local subtensor
 
-- Custom
 ```bash
 poetry run python main.py --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey --subtensor_chain_endpoint address [--world_size gpu_count]
 ```
@@ -234,11 +241,12 @@ Example
 ```bash
 poetry run python main.py --wallet_name test-validator --wallet_hotkey h1 --subtensor_chain_endpoint ws://localhost:9946 --world_size 1
 ```
+
 Or run with pm2
+
 ```bash
 pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_name test-validator --wallet_hotkey h1 --subtensor_chain_endpoint ws://localhost:9946 --world_size 1
 ```
-
 
 #### With auto-updates
 
@@ -246,23 +254,24 @@ pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_na
 2. Make sure you're using the main branch: `git checkout main.`
 
 - Mainnet
+
 ```bash
 pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --wallet_name validator --wallet_hotkey h1 --world_size 1
 ```
 
 - Testnet
+
 ```bash
-pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
+pm2 start --name sn250-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn250-validator --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
 ```
 
-- Custom
+- Local subtensor
+
 ```bash
 pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --wallet_name test-validator --wallet_hotkey h1 --subtensor_chain_endpoint ws://localhost:9946 --world_size 1
 ```
 
-
-
-
 **Explanation of the arguments:**
-- **--netuid**, **--wallet_name**, **--wallet_hotkey**, **--subtensor_network**: These arguments are used to specify the wallet name, hotkey, subtensor network of bittensor network. Plz check (bittensor docs)[https://docs.bittensor.com/] for more details.
+
+- **--netuid**, **--wallet_name**, **--wallet_hotkey**, **--subtensor_network**: These arguments are used to specify the wallet name, hotkey, subtensor network of bittensor network. Kindly check (bittensor docs)[https://docs.bittensor.com/] for more details.
 - **--world_size**: This argument sets the world_size. In the context of the script, it is used to determine the number of GPUs to use, as seen in the get_world_size function. We set 1 as default.
