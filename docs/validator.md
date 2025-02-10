@@ -9,15 +9,15 @@ This script is designed to commit datasets to the Bittensor subtensor chain. It 
 #### Recommended Hardware
 
 - **CPU**: AMD Ryzen 7 or Ryzen 9
-- **RAM**: 64 GB or higher
+- **RAM**: 32 GB or higher (64+ GB recommended)
 - **Storage**: 250 GB free disk space for dataset storage and processing
 - **GPU**:
-  - **Minimum Model**: NVIDIA RTX 3070 or equivalent
-  - **Minimum Memory**: 8 GB of VRAM
+  - **Minimum Model**: NVIDIA RTX 3090 or equivalent
+  - **Minimum Memory**: 24 GB of VRAM
   - **Minimum Count**: 1
   - **Recommended Model**: NVIDIA RTX 3080/3090 or NVIDIA A40
-  - **Recommended Memory**: Minimum 8 GB of VRAM
-  - **Recommended Count**: 4+ (for optimal performance with larger datasets)
+  - **Recommended Memory**: 48 GB of VRAM
+  - **Recommended Count**: 1+ (for optimal performance with larger datasets)
 
 ### 2. **Software Requirements**
 
