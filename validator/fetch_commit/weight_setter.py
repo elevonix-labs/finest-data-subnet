@@ -7,7 +7,11 @@ import os
 import time
 from utils import process_weights_for_netuid, convert_weights_and_uids_for_emit
 import logging
+import wandb
+from dotenv import load_dotenv
 from wandb_logger import WandbLogger
+
+
 # Set up logging
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -77,11 +81,13 @@ def set_weights(
 
 def main(config: bt.config, subtensor: bt.subtensor):
     """Main loop to periodically set weights."""
+    
     try:
         wandb_api_key = os.getenv("WANDB_API_KEY")
         if wandb_api_key is None:
             logging.error("🔴 WANDB_API_KEY is not set")
             sys.exit(1)
+        wandb.login(key=wandb_api_key)
     except Exception as e:
         logging.error(f"🔴 An error occurred while logging in to Wandb: {e}", exc_info=True)
         sys.exit(1)
@@ -132,6 +138,8 @@ def main(config: bt.config, subtensor: bt.subtensor):
 if __name__ == "__main__":
 
     logging.info("Initializing the process...")
+    
+    load_dotenv()
 
     config = utils.get_config()
     subtensor = bt.subtensor(config=config)

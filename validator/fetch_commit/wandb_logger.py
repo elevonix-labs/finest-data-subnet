@@ -1,5 +1,4 @@
 import wandb
-import os
 
 class WandbLogger:
     def __init__(self, project_name="finest-data-subnet", run_name ="miners-stats"):
