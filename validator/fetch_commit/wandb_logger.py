@@ -1,11 +1,11 @@
 import wandb
 
 class WandbLogger:
-    def __init__(self, project_name="finest-data-subnet", run_name ="miners-stats"):
+    def __init__(self, project_name="finest-data-subnet", run_name ="miners-stats", entity="finest-data"):
         self.project_name = project_name
         self.run_name = run_name
         self.run_id = self._get_or_create_run_id()
-        self.run = wandb.init(project=project_name, id=self.run_id, name=self.run_name)
+        self.run = wandb.init(project=project_name, id=self.run_id, name=self.run_name, entity=entity)
         self.api = wandb.Api()
 
     def _get_or_create_run_id(self):
