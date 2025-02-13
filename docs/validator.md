@@ -197,13 +197,13 @@ You can run the script using the following command:
 - Mainnet
 
 ```bash
-poetry run python main.py --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count]
+poetry run python main.py --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count] [--wandb_project <wandb_project_name>] [--wandb_run_name <wandb_run_name>]
 ```
 
 Example
 
 ```bash
-poetry run python main.py --wallet_name validator --wallet_hotkey default --world_size 1
+poetry run python main.py --wallet_name validator --wallet_hotkey default --world_size 1 
 ```
 
 Or run with pm2
@@ -215,7 +215,7 @@ pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_na
 - Testnet
 
 ```bash
-poetry run python main.py --netuid <netuid> --subtensor_network test --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count]
+poetry run python main.py --netuid <netuid> --subtensor_network test --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count] [--wandb_project <wandb_project_name>] [--wandb_run_name <wandb_run_name>]
 ```
 
 Example
@@ -233,7 +233,7 @@ pm2 start main.py --name test-validator --interpreter .venv/bin/python -- --netu
 - Local subtensor
 
 ```bash
-poetry run python main.py --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey --subtensor_chain_endpoint address [--world_size gpu_count]
+poetry run python main.py --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey --subtensor_chain_endpoint address [--world_size gpu_count] [--wandb_project <wandb_project_name>] [--wandb_run_name <wandb_run_name>]
 ```
 
 Example
@@ -257,7 +257,7 @@ pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_na
 - Mainnet
 
 ```bash
-pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --wallet_name validator --wallet_hotkey h1 --world_size 1
+pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --wallet_name validator --wallet_hotkey h1 --world_size 1 
 ```
 
 - Testnet
@@ -276,3 +276,5 @@ pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_vali
 
 - **--netuid**, **--wallet_name**, **--wallet_hotkey**, **--subtensor_network**: These arguments are used to specify the wallet name, hotkey, subtensor network of bittensor network. Kindly check (bittensor docs)[https://docs.bittensor.com/] for more details.
 - **--world_size**: This argument sets the world_size. In the context of the script, it is used to determine the number of GPUs to use, as seen in the get_world_size function. We set 1 as default.
+- **--wandb_project**: This argument sets the wandb project name.
+- **--wandb_run_name**: This argument sets the wandb run name.
