@@ -276,5 +276,5 @@ pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_vali
 
 - **--netuid**, **--wallet_name**, **--wallet_hotkey**, **--subtensor_network**: These arguments are used to specify the wallet name, hotkey, subtensor network of bittensor network. Kindly check (bittensor docs)[https://docs.bittensor.com/] for more details.
 - **--world_size**: This argument sets the world_size. In the context of the script, it is used to determine the number of GPUs to use, as seen in the get_world_size function. We set 1 as default.
-- **--wandb_project**: This argument sets the wandb project name.
-- **--wandb_run_name**: This argument sets the wandb run name.
+- **--wandb_project**: This argument sets the wandb project name. Default is `finest-data-subnet`.
+- **--wandb_run_name**: This argument sets the wandb run name. Default is `miners-stats`.
