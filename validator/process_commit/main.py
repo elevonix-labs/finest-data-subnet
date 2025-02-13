@@ -3,6 +3,7 @@ import redis
 import json
 import requests
 import os
+import sys
 import numpy as np
 import logging
 import argparse
@@ -186,7 +187,20 @@ def process_commits(redis_queue: redis.Redis, world_size: int):
 
 def main():
     try:
-        redis_queue = redis.Redis(host="localhost", port=6379, db=0)
+        try:
+            redis_queue = redis.Redis(host="localhost", port=6379, db=0)
+            if redis_queue.ping():
+                logging.info("🟢 Successfully connected to Redis.")
+            else:
+                logging.error("🔴 Failed to connect to Redis.")
+                return
+        except redis.ConnectionError as e:
+            logging.error(f"🔴 Redis connection error: {e}")
+            return
+        except Exception as e:
+            logging.error(f"🔴 An unexpected error occurred while connecting to Redis: {e}")
+            return
+
         logging.info("Starting process commits 🚀")
         world_size = get_world_size()
         process_commits(redis_queue, world_size)

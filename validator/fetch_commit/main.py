@@ -173,7 +173,21 @@ def fetch_commits(config: bt.config, redis_queue: redis.Redis):
 def main():
 
     try:
-        redis_queue = redis.Redis(host="localhost", port=6379, db=0)
+        try:
+            redis_queue = redis.Redis(host="localhost", port=6379, db=0)
+
+            if redis_queue.ping():
+                logging.info("🟢 Successfully connected to Redis.")
+            else:
+                logging.error("🔴 Failed to connect to Redis.")
+                return
+        except redis.ConnectionError as e:
+            logging.error(f"🔴 Redis connection error: {e}")
+            return
+        except Exception as e:
+            logging.error(f"🔴 An unexpected error occurred while connecting to Redis: {e}")
+            return
+        print(redis_queue)
         config = utils.get_config()
         logging.info(config)
         fetch_commits(config, redis_queue)

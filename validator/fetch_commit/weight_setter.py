@@ -79,21 +79,39 @@ def set_weights(
         return False
 
 
-def main(config: bt.config, subtensor: bt.subtensor):
+def main(config, subtensor: bt.subtensor):
     """Main loop to periodically set weights."""
     
     try:
         wandb_api_key = os.getenv("WANDB_API_KEY")
         if wandb_api_key is None:
             logging.error("🔴 WANDB_API_KEY is not set")
-            sys.exit(1)
+            return
         wandb.login(key=wandb_api_key)
     except Exception as e:
-        logging.error(f"🔴 An error occurred while logging in to Wandb: {e}", exc_info=True)
-        sys.exit(1)
+        logging.error(f"🔴 An error occurred while logging in to Wandb: {e}")
+        return
 
-    wandb_logger = WandbLogger()
-    redis_queue = redis.Redis(host="localhost", port=6379, db=0)
+    wandb_logger = WandbLogger(config.wandb_project, config.wandb_run_name)
+    
+    if wandb_logger.initialized is False:
+        logging.error("🔴 WandbLogger failed to initialize, check your WANDB_API_KEY")
+        return
+
+    try:
+        redis_queue = redis.Redis(host="localhost", port=6379, db=0)
+
+        if redis_queue.ping():
+            logging.info("🟢 Successfully connected to Redis.")
+        else:
+            logging.error("🔴 Failed to connect to Redis.")
+            return
+    except redis.ConnectionError as e:
+        logging.error(f"🔴 Redis connection error: {e}")
+        return
+    except Exception as e:
+        logging.error(f"🔴 An unexpected error occurred while connecting to Redis: {e}")
+        return
 
     saved_scores = wandb_logger.get_all_scores()
 
@@ -125,8 +143,8 @@ def main(config: bt.config, subtensor: bt.subtensor):
                     time.sleep(10)
 
             except Exception as e:
-                logging.error(f"An error occurred in the main loop: {e}", exc_info=True)
-                sys.exit(1)
+                logging.error(f"An error occurred in the main loop: {e}")
+                return
 
     except KeyboardInterrupt:
         print("🔴 Weight-setter Process interrupted by user.")

@@ -1,11 +1,19 @@
 import wandb
+import sys
 
 class WandbLogger:
-    def __init__(self, project_name="finest-data-subnet", run_name ="miners-stats", entity="finest-data"):
+    def __init__(self, project_name="finest-data-subnet", run_name="miners-stats"):
         self.project_name = project_name
         self.run_name = run_name
         self.run_id = self._get_or_create_run_id()
-        self.run = wandb.init(project=project_name, id=self.run_id, name=self.run_name, entity=entity)
+        self.entity = self._get_entity()
+        self.initialized = False
+        try:
+            self.run = wandb.init(project=project_name, id=self.run_id, name=self.run_name, entity=self.entity)
+            self.initialized = True
+        except Exception as _:
+            self.run = None
+            self.initialized = False
         self.api = wandb.Api()
 
     def _get_or_create_run_id(self):
@@ -26,6 +34,14 @@ class WandbLogger:
 
         return run_id
     
+    def _get_entity(self):
+        try:
+            api = wandb.Api(timeout=60)
+            user = api.viewer
+            return user.entity
+        except Exception:
+            return None
+
     def log_wandb(self, data):
         wandb.log(data)
 
