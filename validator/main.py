@@ -103,6 +103,10 @@ def run_weight_setter(args):
         args.wallet_hotkey,
         "--subtensor.network",
         args.subtensor_network,
+        "--wandb_project",
+        args.wandb_project,
+        "--wandb_run_name",
+        args.wandb_run_name,
     ]
 
     if args.subtensor_chain_endpoint:
@@ -146,6 +150,19 @@ def main():
             type=str,
             help="The subtensor network endpoint",
         )
+        parser.add_argument(
+            "--wandb_project",
+            type=str,
+            default="finest-data-subnet",
+            help="The wandb project name",
+        )
+        parser.add_argument(
+            "--wandb_run_name",
+            type=str,
+            default="miners-stats",
+            help="The wandb run name",
+        )
+
         parser.add_argument(
             "--world_size", type=int, default=1, help="The number of GPUs to utilize"
         )

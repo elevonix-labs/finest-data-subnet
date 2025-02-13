@@ -3,6 +3,7 @@ import time
 import logging
 import bittensor as bt
 import redis
+import sys
 import json
 import utils
 import requests
@@ -97,7 +98,21 @@ def report_score(config: bt.config, redis_queue: redis.Redis):
 
 def main():
     try:
-        redis_queue = redis.Redis(host="localhost", port=6379, db=0)
+        try:
+            redis_queue = redis.Redis(host="localhost", port=6379, db=0)
+
+            if redis_queue.ping():
+                logging.info("🟢 Successfully connected to Redis.")
+            else:
+                logging.error("🔴 Failed to connect to Redis.")
+                return
+            
+        except redis.ConnectionError as e:
+            logging.error(f"🔴 Redis connection error: {e}")
+            return
+        except Exception as e:
+            logging.error(f"🔴 An unexpected error occurred while connecting to Redis: {e}")
+            return
         config = utils.get_config()
         report_score(config, redis_queue)
     except KeyboardInterrupt:

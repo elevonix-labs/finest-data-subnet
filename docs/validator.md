@@ -9,15 +9,15 @@ This script is designed to commit datasets to the Bittensor subtensor chain. It 
 #### Recommended Hardware
 
 - **CPU**: AMD Ryzen 7 or Ryzen 9
-- **RAM**: 64 GB or higher
+- **RAM**: 32 GB or higher (64+ GB recommended)
 - **Storage**: 250 GB free disk space for dataset storage and processing
 - **GPU**:
-  - **Minimum Model**: NVIDIA RTX 3070 or equivalent
-  - **Minimum Memory**: 8 GB of VRAM
+  - **Minimum Model**: NVIDIA RTX 3090 or equivalent
+  - **Minimum Memory**: 24 GB of VRAM
   - **Minimum Count**: 1
   - **Recommended Model**: NVIDIA RTX 3080/3090 or NVIDIA A40
-  - **Recommended Memory**: Minimum 8 GB of VRAM
-  - **Recommended Count**: 4+ (for optimal performance with larger datasets)
+  - **Recommended Memory**: 48 GB of VRAM
+  - **Recommended Count**: 1+ (for optimal performance with larger datasets)
 
 ### 2. **Software Requirements**
 
@@ -71,7 +71,7 @@ poetry --version
 ### Installing PM2 (optional)
 
 ```bash
-sudo apt install nodejs && npm
+sudo apt install nodejs npm
 npm install -g pm2@latest
 ```
 
@@ -93,7 +93,6 @@ region = us-west-1
 output = json
 ```
 
-
 ~/.aws/credentials
 
 ```bash
@@ -101,6 +100,7 @@ output = json
 aws_access_key_id = YOUR_ACCESS_KEY_ID
 aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
 ```
+
 Or you can add it in .env file
 Plz check .env.sample file for more details.
 
@@ -118,6 +118,14 @@ You need to add API_URL in .env file.
 API_URL=https://finest-data-api.elevonix.io/api
 ```
 
+### Adding WANDB_API_KEY
+
+You need to add WANDB_API_KEY in .env file.
+
+```bash
+WANDB_API_KEY=YOUR_WANDB_API_KEY
+```
+
 ### Installing Dependencies
 
 Ensure you have the required dependencies installed. You can use the following command to install them:
@@ -128,7 +136,8 @@ cd validator
 
 ```
 
-### Running  Redis
+### Running Redis
+
 We should have redis running on the machine.
 
 If you didn't install sudo, install it first.
@@ -146,16 +155,17 @@ sudo apt install redis-server
 sudo service redis-server start
 
 ```
+
 Check if redis is running
 
 ```bash
 redis-cli ping
 ```
 
-
 ## Running Validator
 
 ### 1. Creating Bittensor wallet.
+
 Make sure you have the necessary environment setup. You should have a Bittensor wallet and access to the Bittensor subtensor chain.
 
 You can active poetry venv for creating wallet.
@@ -178,7 +188,6 @@ For example,
 
 You can check more about it in [bittensor docs](https://docs.bittensor.com/working-with-keys)
 
-
 ### 2. Running the Script
 
 #### Without auto-updates
@@ -186,23 +195,27 @@ You can check more about it in [bittensor docs](https://docs.bittensor.com/worki
 You can run the script using the following command:
 
 - Mainnet
+
 ```bash
-poetry run python main.py --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count]
+poetry run python main.py --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count] [--wandb_project <wandb_project_name>] [--wandb_run_name <wandb_run_name>]
 ```
 
 Example
 
 ```bash
-poetry run python main.py --wallet_name validator --wallet_hotkey default --world_size 1
+poetry run python main.py --wallet_name validator --wallet_hotkey default --world_size 1 
 ```
+
 Or run with pm2
+
 ```bash
 pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_name validator --wallet_hotkey default --world_size 1
 ```
 
 - Testnet
+
 ```bash
-poetry run python main.py --netuid <netuid> --subtensor_network test --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count]
+poetry run python main.py --netuid <netuid> --subtensor_network test --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey [--world_size gpu_count] [--wandb_project <wandb_project_name>] [--wandb_run_name <wandb_run_name>]
 ```
 
 Example
@@ -210,15 +223,17 @@ Example
 ```bash
 poetry run python main.py --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
 ```
+
 Or run with pm2
+
 ```bash
 pm2 start main.py --name test-validator --interpreter .venv/bin/python -- --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
 ```
 
+- Local subtensor
 
-- Custom
 ```bash
-poetry run python main.py --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey --subtensor_chain_endpoint address [--world_size gpu_count]
+poetry run python main.py --wallet_name your_wallet_name --wallet_hotkey wallet_hotkey --subtensor_chain_endpoint address [--world_size gpu_count] [--wandb_project <wandb_project_name>] [--wandb_run_name <wandb_run_name>]
 ```
 
 Example
@@ -226,35 +241,40 @@ Example
 ```bash
 poetry run python main.py --wallet_name test-validator --wallet_hotkey h1 --subtensor_chain_endpoint ws://localhost:9946 --world_size 1
 ```
+
 Or run with pm2
+
 ```bash
 pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_name test-validator --wallet_hotkey h1 --subtensor_chain_endpoint ws://localhost:9946 --world_size 1
 ```
 
-
 #### With auto-updates
 
-1. For running with auto-updates, you should run it in project root directory, now you are in `validator` directory, so can run this command `cd ..`
-2. Make sure you're using the main branch: `git checkout main.`
+1. To enable auto-updates, ensure you are in the project root directory. If you are currently in the `validator` directory, execute `cd ..` to navigate to the root.
+2. Verify that you are on the main branch by running: `git checkout main`.
+3. Ensure your Git credentials are configured correctly, as they are required to execute Git commands necessary for the auto-update process.
 
 - Mainnet
+
 ```bash
-pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --wallet_name validator --wallet_hotkey h1 --world_size 1
+pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --wallet_name validator --wallet_hotkey h1 --world_size 1 
 ```
 
 - Testnet
+
 ```bash
-pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
+pm2 start --name sn250-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn250-validator --netuid 250 --subtensor_network test --wallet_name test-validator --wallet_hotkey h1 --world_size 1
 ```
 
-- Custom
+- Local subtensor
+
 ```bash
 pm2 start --name sn63-validator-updater --interpreter python3 scripts/start_validator.py -- --pm2_name sn63-validator --wallet_name test-validator --wallet_hotkey h1 --subtensor_chain_endpoint ws://localhost:9946 --world_size 1
 ```
 
-
-
-
 **Explanation of the arguments:**
-- **--netuid**, **--wallet_name**, **--wallet_hotkey**, **--subtensor_network**: These arguments are used to specify the wallet name, hotkey, subtensor network of bittensor network. Plz check (bittensor docs)[https://docs.bittensor.com/] for more details.
+
+- **--netuid**, **--wallet_name**, **--wallet_hotkey**, **--subtensor_network**: These arguments are used to specify the wallet name, hotkey, subtensor network of bittensor network. Kindly check (bittensor docs)[https://docs.bittensor.com/] for more details.
 - **--world_size**: This argument sets the world_size. In the context of the script, it is used to determine the number of GPUs to use, as seen in the get_world_size function. We set 1 as default.
+- **--wandb_project**: This argument sets the wandb project name. Default is `finest-data-subnet`.
+- **--wandb_run_name**: This argument sets the wandb run name. Default is `miners-stats`.
