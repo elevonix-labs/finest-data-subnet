@@ -25,48 +25,8 @@ import shutil
 import logging
 from utils import assert_registered
 from generate import generate_signature
-from colorama import Fore, init
-
-# Initialize colorama
-init(autoreset=True)
-
-
-# Custom logging formatter to add colors and emojis
-class ColoredFormatter(logging.Formatter):
-    COLORS = {
-        "CRITICAL":Fore.BLUE,
-        "INFO": Fore.GREEN,
-        "WARNING": Fore.YELLOW,
-        "ERROR": Fore.RED,
-    }
-
-    def format(self, record):
-        log_level = record.levelname
-        color = self.COLORS.get(log_level, Fore.WHITE)
-
-        message = super().format(record)
-        return f"{color} {message}"
-
-
-# Configure logging with color logging for console output
-logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
-    handlers=[
-        logging.StreamHandler(),  # Outputs to the console
-        logging.FileHandler("commit_processing.log", mode="w"),  # Logs to a file
-    ],
-)
-
-# Get the root logger
-logger = logging.getLogger()
-
-# Set custom colored formatter for the console handler
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(
-    ColoredFormatter("%(asctime)s - %(levelname)s - %(message)s")
-)
-logger.handlers[0] = console_handler
+from miner.check_slurm import terminate_slurm_jobs
+from miner.logger_config import logger
 
 try:
     nltk.data.find("tokenizers/punkt")
@@ -228,17 +188,6 @@ async def processing(config):
             await asyncio.wait_for(asyncio.sleep(8 * 3600), timeout=8 * 3600)
         except asyncio.TimeoutError:
             pass 
-
-def terminate_slurm_jobs():
-    """
-    Function to terminate all running SLURM jobs.
-    """
-    try:
-        # Assuming you have a command to cancel all SLURM jobs
-        os.system("scancel -u $USER")
-        logger.info("All SLURM jobs have been terminated.")
-    except Exception as e:
-        logger.error(f"Failed to terminate SLURM jobs: {e}")
 
 def main():
     try:

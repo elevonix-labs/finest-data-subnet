@@ -1,6 +1,19 @@
 import subprocess
 import time
 import os
+from miner.logger_config import logger
+
+def terminate_slurm_jobs():
+    """
+    Function to terminate all running SLURM jobs.
+    """
+    try:
+        # Assuming you have a command to cancel all SLURM jobs
+        os.system("scancel -u $USER")
+        logger.info("All SLURM jobs have been terminated.")
+    except Exception as e:
+        logger.error(f"Failed to terminate SLURM jobs: {e}")
+
 
 def check_slurm_job_status(job_id):
     """
@@ -53,18 +66,15 @@ def wait_for_job_completion(job_id, check_interval=30, timeout=24 * 60 * 60):
         print(f"Job {job_id} status: {status}")
 
         if status == "COMPLETED":
-            print(f"Job {job_id} has completed.")
+            logger.info(f"Job {job_id} has completed.")
             return status
         elif status == "FAILED":
-            print(f"Job {job_id} has failed.")
+            logger.error(f"Job {job_id} has failed.")
             return status
         elif time.time() - start_time > timeout:
-            print(f"Job {job_id} did not complete within 1 day, aborting.")
-            try:
-                os.system("scancel -u $USER")
-                print("All jobs have been cancelled.")
-            except subprocess.CalledProcessError as e:
-                print(f"Failed to cancel jobs: {e}")
+            logger.error(f"Job {job_id} did not complete within 1 day, aborting.")
+            terminate_slurm_jobs()
+            logger.info("All jobs have been cancelled.")
             return False
         # Wait for the next check
         time.sleep(check_interval)
