@@ -389,6 +389,8 @@ You can check more about it in [bittensor docs](https://docs.bittensor.com/worki
 
 You can run the pipeline using the provided script. Here's an example command to execute the script:
 
+In here cpus_per_task should be same or less than the number of cores in your CPU.
+
 - Mainnet
 ```bash
 poetry run python miner/main.py --hf_repo your_hf_repo --wallet.name your_wallet_name --wallet.hotkey your_wallet_hotkey [--total_tasks total_task] [--cpus_per_task your_cpus_number]

@@ -25,6 +25,18 @@ def get_config():
         default=63,
         help="The unique identifier for the network",
     )
+    parser.add_argument(
+        "--wandb_project",
+        type=str,
+        default="finest-data-subnet",
+        help="The wandb project name",
+    )
+    parser.add_argument(
+        "--wandb_run_name",
+        type=str,
+        default="miners-stats",
+        help="The wandb run name",
+    )
     # Add Bittensor-specific arguments
     bt.wallet.add_args(parser)
     bt.subtensor.add_args(parser)
