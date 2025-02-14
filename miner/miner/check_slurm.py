@@ -37,15 +37,15 @@ def check_slurm_job_status(job_id):
         return "UNKNOWN"
 
 
-def wait_for_job_completion(job_id, check_interval=30):
+def wait_for_job_completion(job_id, check_interval=30, timeout=24 * 60 * 60):
     """
     Wait for a Slurm job to complete.
 
     Args:
         job_id (int): Slurm job ID.
         check_interval (int): Time interval (in seconds) to check the job status.
+        timeout (int): Time to wait for the job to complete (in seconds).
     """
-    timeout = 8 * 60 * 60
     start_time = time.time()
 
     while True:
