@@ -1,6 +1,6 @@
 import os
 import requests
-
+from miner.logger_config import logger
 
 def fetch_warc_files(hotkey, message, signature):
     """Fetches warc file paths from the API."""
@@ -17,12 +17,12 @@ def fetch_warc_files(hotkey, message, signature):
         return warc_files
     except requests.HTTPError as http_err:
         if response.status_code == 404:
-            print(f"{response.json().get('message', 'Unknown error')}")
+            logger.error(f"{response.json().get('message', 'Unknown error')}")
         else:
-            print(f"HTTP error occurred: {http_err}")
+            logger.error(f"HTTP error occurred: {http_err}")
         return []
     except requests.RequestException as req_err:
-        print(f"Error fetching WARC files: {str(req_err)}")
+        logger.error(f"Error fetching WARC files: {str(req_err)}")
         return []
 
 
