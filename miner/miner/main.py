@@ -216,11 +216,10 @@ async def processing(config):
                         )
                         await asyncio.sleep(20)
                         retry_count += 1
-
         else:
-            logger.error("The data processing failed due to a misconfiguration in the Slurm setup. Please review the Slurm configuration settings to resolve the issue")
-            return
-        
+            logger.error("Data processing failed, waiting for 8 hours before retrying 🕒")
+            await asyncio.sleep(8 * 3600)
+            continue
         end = time.time() - start
         logger.info(f"Processing time: {end:.2f} seconds 🕒")
         
@@ -230,6 +229,17 @@ async def processing(config):
         except asyncio.TimeoutError:
             pass 
 
+def terminate_slurm_jobs():
+    """
+    Function to terminate all running SLURM jobs.
+    """
+    try:
+        # Assuming you have a command to cancel all SLURM jobs
+        os.system("scancel -u $USER")
+        logger.info("All SLURM jobs have been terminated.")
+    except Exception as e:
+        logger.error(f"Failed to terminate SLURM jobs: {e}")
+
 def main():
     try:
         config = get_config()
@@ -238,6 +248,7 @@ def main():
 
     except KeyboardInterrupt:
         logger.error("🔴 Mining process interrupted by user.")
+        terminate_slurm_jobs()
 
 
 if __name__ == "__main__":

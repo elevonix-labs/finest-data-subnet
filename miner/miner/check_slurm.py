@@ -1,6 +1,6 @@
 import subprocess
 import time
-
+import os
 
 def check_slurm_job_status(job_id):
     """
@@ -45,6 +45,9 @@ def wait_for_job_completion(job_id, check_interval=30):
         job_id (int): Slurm job ID.
         check_interval (int): Time interval (in seconds) to check the job status.
     """
+    timeout = 8 * 60 * 60
+    start_time = time.time()
+
     while True:
         status = check_slurm_job_status(job_id)
         print(f"Job {job_id} status: {status}")
@@ -55,6 +58,13 @@ def wait_for_job_completion(job_id, check_interval=30):
         elif status == "FAILED":
             print(f"Job {job_id} has failed.")
             return status
-
+        elif time.time() - start_time > timeout:
+            print(f"Job {job_id} did not complete within 1 day, aborting.")
+            try:
+                os.system("scancel -u $USER")
+                print("All jobs have been cancelled.")
+            except subprocess.CalledProcessError as e:
+                print(f"Failed to cancel jobs: {e}")
+            return False
         # Wait for the next check
         time.sleep(check_interval)
