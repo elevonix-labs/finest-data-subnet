@@ -253,6 +253,12 @@ pm2 start main.py --name validator --interpreter .venv/bin/python -- --wallet_na
 1. To enable auto-updates, ensure you are in the project root directory. If you are currently in the `validator` directory, execute `cd ..` to navigate to the root.
 2. Verify that you are on the main branch by running: `git checkout main`.
 3. Ensure your Git credentials are configured correctly, as they are required to execute Git commands necessary for the auto-update process.
+4. Check if you have configured your Git to pull from the repository:
+   - Run `git remote -v` to verify the remote URL.
+   - Perform a dry run of `git pull` to check for any issues without making changes: `git pull --dry-run`.
+   - Ensure your network connection is active.
+   - If the above steps do not resolve the issue, check your Git configurations:
+
 
 - Mainnet
 
